@@ -1,5 +1,5 @@
 package View;
-
+/*
 import Model.DataBase;
 
 import java.awt.*;
@@ -721,3 +721,4 @@ public class App implements Serializable
 
 
 }
+*/
