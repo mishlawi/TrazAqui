@@ -9,19 +9,16 @@ public class Loja extends Ator {
     //Variáveis de instância
 
     private String referencia;
-    private Point2D.Double moradaLoja;
-    private String nome;
     private int fila;
-    private float espera; //tempo médio de espera
+    private float espera; //tempo médio de espera por cliente
     private List<Encomenda> encomendas;
     private Servico servico;
 
 
 
     public Loja(){
-        this.nome = "";
+
         this.referencia = "";
-        this.moradaLoja = null;
         this.fila = 0;
         this.espera = 0;
         this.encomendas = new ArrayList<>();
@@ -30,9 +27,8 @@ public class Loja extends Ator {
 
 
     public Loja(String nome,String referencia, Point2D.Double moradaLoja, int fila, float espera, List<Encomenda> enc, Servico s) {
-        this.nome = nome;
+
         this.referencia =  referencia;
-        this.moradaLoja = moradaLoja;
         this.fila = fila;
         this.espera = espera;
         this.encomendas = enc;
@@ -42,7 +38,6 @@ public class Loja extends Ator {
     public Loja (Loja a) {
     setNome(a.getNome());
     setReferencia(a.getReferencia());
-    setMoradaLoja(a.getMoradaLoja());
     setFila(a.getFila());
     setEspera(a.getEspera());
     this.encomendas = a.getPedidos();
@@ -51,12 +46,8 @@ public class Loja extends Ator {
 
 
 
-    public String getNome() {
-        return nome;
-    }
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+
+
 
     public String getReferencia(){
         return this.referencia;
@@ -64,14 +55,6 @@ public class Loja extends Ator {
 
     public void setReferencia(String referencia) {
         this.referencia = referencia;
-    }
-
-    public Point2D.Double getMoradaLoja() {
-        return moradaLoja;
-    }
-
-    public void setMoradaLoja(Point2D.Double moradaLoja) {
-        this.moradaLoja = moradaLoja;
     }
 
     public int getFila() {
@@ -114,5 +97,13 @@ public class Loja extends Ator {
     }
 
 
+
+    /**
+    Métodos
+     */
+
+    public double tempoTotalEspera(){
+        return this.getFila() * this.getEspera();
+    }
 
 }

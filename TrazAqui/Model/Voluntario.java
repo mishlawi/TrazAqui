@@ -8,7 +8,7 @@ import java.util.Map;
 public class Voluntario extends Transporte
 {
     //Variáveis de instância
-    private Map<String,Encomenda> encomendas; //registo de encomendas
+    private Map<String,Encomenda> encomendas; //registo de encomendas k:referencia encomenda
 
 
 
@@ -17,18 +17,17 @@ public class Voluntario extends Transporte
     public Voluntario(){
         super();
         this.encomendas = new HashMap<>();
-
-
     }
 
-    public Voluntario(String referencia, boolean disponibilidade, float raio, boolean certeficado, double classificacao, Point2D.Double latiLongi, int numeroEntregas, double velocidadeMedia, Map<String,Encomenda> enc, String password) {
-        super(referencia, disponibilidade,raio, certeficado,  classificacao, latiLongi, numeroEntregas,velocidadeMedia,password);
+    public Voluntario(String email, String referencia, String nome, String password, Point2D.Double morada, long nif, boolean disponibilidade, float raio, boolean certeficado, double classificacao, int numeroEntregas , double velocidadeMedia, double nrKms, Map<String,Encomenda> enc) {
+        super(email, referencia, nome, password, morada,nif, disponibilidade,raio, certeficado,  classificacao, numeroEntregas, velocidadeMedia, nrKms);
         setEncomendas(enc);
        }
 
 
     public Voluntario(Voluntario e) {
-            super(e.getReferencia(),e.isDisponivel(),e.getRaio(),e.isCerteficado(),e.getClassificacao(),e.getLocalizacao(),e.getNumeroEntregas(),e.getVelocidadeMedia(), e.getPassword());
+        super(e.getEmail(),e.getReferencia(),e.getNome(),e.getPassword(),e.getMorada(),e.getNif(),e.isDisponivel(),e.getRaio(),e.isCerteficado(),e.getClassificacao(),e.getNumeroEntregas(),e.getVelocidadeMedia(),e.getNumeroKms());
+
             setEncomendas(e.getEncomendas());
 
     }
@@ -40,6 +39,21 @@ public class Voluntario extends Transporte
             for (Map.Entry<String,Encomenda> e : this.encomendas.entrySet())
                 aux.put(e.getKey(),e.getValue().clone());
             return aux;
+    }
+
+
+    public Map<String,Encomenda> getEncomendasEfetuadas(){
+        Map<String,Encomenda> aux = new HashMap<>();
+        for (Map.Entry<String,Encomenda> e : this.encomendas.entrySet())
+            if(e.getValue().isEfetuada()) aux.put(e.getKey(),e.getValue().clone());
+        return aux;
+    }
+
+    public Map<String,Encomenda> getEncomendasPedidas(){
+        Map<String,Encomenda> aux = new HashMap<>();
+        for (Map.Entry<String,Encomenda> e : this.encomendas.entrySet())
+            if(!e.getValue().isEfetuada()) aux.put(e.getKey(),e.getValue().clone());
+        return aux;
     }
 
 
@@ -79,7 +93,7 @@ public class Voluntario extends Transporte
     /* metodos */
 
     public void updateLocalizacao(Point2D.Double n){
-        setLocalizacao(n);
+        setMorada(n);
     }
 
 

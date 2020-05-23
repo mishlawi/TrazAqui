@@ -12,9 +12,9 @@ import java.util.List;
 public class Encomenda
 {
      //Variáveis de instância
-    private String comprador; //vai ter a referencia do utilizador
-    private String distribuidor; //vai ter a referencia da empresa/voluntario que efetuou a ecomenda
-    private String loja; //codigo da loja a que foi comprado
+    private User comprador; //vai ter o email do utilizador
+    private Transporte distribuidor; //vai ter o email da empresa/voluntario que efetuou a ecomenda
+    private Loja loja; //email da loja a que foi comprado
     private Point2D.Double moradaLoja; //morada origem é morada da loja
     private Point2D.Double moradaUtilizador; // morada destino é morada do utilizador
     private String referencia;
@@ -23,6 +23,7 @@ public class Encomenda
     private Duration tempo; //tempo que demorou o transporte de uma entrega
     private List<Produto> produtos;
     private double custo;
+    private boolean efetuada;
 
 
 
@@ -31,9 +32,9 @@ public class Encomenda
     
     public Encomenda(){
 
-        this.comprador ="";
-        this.distribuidor="";
-        this.loja ="";
+        this.comprador = new User();
+        this.distribuidor = new Transporte();
+        this.loja = new Loja();
         this.moradaLoja=null;
         this.moradaUtilizador=null;
         this.referencia="";
@@ -42,10 +43,11 @@ public class Encomenda
         this.tempo=null;
         this.produtos = new ArrayList<>();
         this.custo = 0;
+        this.efetuada = false;
 
     }
     
-    public Encomenda(String comprador, String distribuidor, String loja, Point2D.Double moradaLoja, Point2D.Double moradaUtilizador, String referencia, float peso, LocalDateTime date, Duration tempo, List<Produto> lst,double custo){
+    public Encomenda(User comprador, Transporte distribuidor, Loja loja, Point2D.Double moradaLoja, Point2D.Double moradaUtilizador, String referencia, float peso, LocalDateTime date, Duration tempo, List<Produto> lst,double custo, boolean efetuada){
        this.comprador = comprador;
        this.distribuidor = distribuidor;
        this.loja = loja;
@@ -57,7 +59,7 @@ public class Encomenda
        this.tempo = tempo;
        setProdutos(lst);
        this.custo = custo;
-
+       this.efetuada = efetuada;
     }
 
 
@@ -74,19 +76,20 @@ public class Encomenda
        this.tempo = a.getTempo();
        this.produtos=a.getProdutos();
        this.custo = a.getCusto();
+       this.efetuada = a.isEfetuada();
 
     }
     
     // Getters
-    public String getComprador() {
-        return comprador;
+    public User getComprador() {
+        return this.comprador;
     }
 
-    public String getDistribuidor() {
-        return distribuidor;
+    public Transporte getDistribuidor() {
+        return this.distribuidor;
     }
 
-    public String getLoja(){return this.loja; }
+    public Loja getLoja(){return this.loja; }
 
     public Point2D.Double getMoradaLoja(){
         return this.moradaLoja;
@@ -124,6 +127,10 @@ public class Encomenda
         return custo;
     }
 
+    public boolean isEfetuada() {
+        return efetuada;
+    }
+
     public void setData(LocalDateTime data) {
         this.data = data;
     }
@@ -132,15 +139,15 @@ public class Encomenda
         this.moradaLoja=moradaLoja;
     }
 
-    public void setComprador(String comprador) {
+    public void setComprador(User comprador) {
         this.comprador = comprador;
     }
 
-    public void setDistribuidor(String distribuidor) {
+    public void setDistribuidor(Transporte distribuidor) {
         this.distribuidor = distribuidor;
     }
 
-    public void setLoja(String loja) {
+    public void setLoja(Loja loja) {
         this.loja = loja;
     }
 
@@ -180,6 +187,8 @@ public class Encomenda
     }
 
 /*VER*/
+
+
     private void geraReferencia(){
 
     }

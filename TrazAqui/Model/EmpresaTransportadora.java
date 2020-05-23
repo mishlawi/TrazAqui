@@ -14,6 +14,7 @@ public class EmpresaTransportadora extends Transporte
     private double totalFaturado;
 
 
+
     public EmpresaTransportadora(){
         super();
         this.taxa = 0;
@@ -22,9 +23,9 @@ public class EmpresaTransportadora extends Transporte
     }
 
 
-    public EmpresaTransportadora(String referencia, boolean disponibilidade, float raio, boolean certeficado, double classificacao, Point2D.Double latiLongi, int numeroEntregas, double velocidadeMedia, double custoTransporte,Map<String,Encomenda> encomendas, String password,double totalFaturado) {
+    public EmpresaTransportadora(String email,String referencia, String nome, String password, Point2D.Double morada, long nif, boolean disponibilidade, float raio, boolean certeficado, double classificacao, int numeroEntregas , double velocidadeMedia, double numeroKms, double custoTransporte,Map<String,Encomenda> encomendas,double totalFaturado) {
 
-        super( referencia, disponibilidade,raio, certeficado,  classificacao, latiLongi, numeroEntregas, velocidadeMedia, password);
+        super(email,referencia,nome, password, morada,nif, disponibilidade,raio, certeficado,  classificacao, numeroEntregas,velocidadeMedia, numeroKms);
         this.taxa = custoTransporte;
         this.encomendas = encomendas;
         this.totalFaturado = totalFaturado;
@@ -32,7 +33,7 @@ public class EmpresaTransportadora extends Transporte
     }
 
     public EmpresaTransportadora (EmpresaTransportadora e){
-        super(e.getReferencia(),e.isDisponivel(),e.getRaio(),e.isCerteficado(),e.getClassificacao(),e.getLocalizacao(),e.getNumeroEntregas(),e.getVelocidadeMedia(), e.getPassword());
+        super(e.getEmail(),e.getReferencia(),e.getNome(), e.getPassword(),e.getMorada(),e.getNif(),e.isDisponivel(),e.getRaio(),e.isCerteficado(),e.getClassificacao(),e.getNumeroEntregas(),e.getVelocidadeMedia(),e.getNumeroKms());
         setTaxa(e.getTaxa());
         setEncomendas(e.getEncomendas());
         setTotalFaturado(e.getTotalFaturado());
@@ -94,14 +95,20 @@ public class EmpresaTransportadora extends Transporte
 /*Métodos*/
 
     public double defineCusto(Encomenda a ){
-    return ((getLocalizacao().distance(a.getMoradaLoja())+a.getMoradaLoja().distance(a.getMoradaUtilizador()))*this.getTaxa()*a.getPeso());
+    return ((this.getMorada().distance(a.getMoradaLoja())+a.getMoradaLoja().distance(a.getMoradaUtilizador()))*this.getTaxa()*a.getPeso());
     }
 
+    //adiciona valor de um transporte ao total faturado
+    public void addFatura(Encomenda a){
+        setTotalFaturado(getTotalFaturado()+defineCusto(a));
+    }
 
     public boolean distanciaValida(Encomenda a){
-        if (a.getMoradaLoja().distance(getLocalizacao())>getRaio()) return false;
+        if (a.getMoradaLoja().distance(this.getMorada())>getRaio()) return false;
         else return true;
     }
+
+
 
 
 

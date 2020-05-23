@@ -6,58 +6,57 @@ import java.time.LocalTime;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-public abstract class Transporte extends Ator {
+public  class Transporte extends Ator {
 
-    private String email; //aka referencia
+
+    /**
+    * Variaveis de instancia
+     */
     private boolean disponibilidade;
     private float raio;
     private boolean certeficado;
     private double classificacao;
-    private Point2D.Double localizacao;
     private int numeroEntregas;
     private double velocidadeMedia; //em km/h
-    private String password;
+    private double numeroKms;
 
     public Transporte(){
-        this.email= new String();
+        super();
         this.disponibilidade = true;
         this.raio = 0;
         this.certeficado = false;
         this.classificacao = 0;
-        this.localizacao = null;
         this.numeroEntregas = 0;
         this.velocidadeMedia = 0;
-        this.password = new String();
+        this.numeroKms = 0;
+
+
     }
 
-    public Transporte(String email, boolean disponibilidade, float raio, boolean certeficado, double classificacao,Point2D.Double localizacao, int NumeroEntregas , double VelocidadeMedia, String password) {
-        this.email = email;
+    public Transporte(String email, String referencia, String nome, String password, Point2D.Double morada, long nif, boolean disponibilidade, float raio, boolean certeficado, double classificacao, int NumeroEntregas , double VelocidadeMedia, double nrKms) {
+        super(email,referencia,nome,password, morada, nif);
         this.disponibilidade = disponibilidade;
         this.raio = raio;
         this.certeficado = certeficado;
         this.classificacao = classificacao;
-        this.localizacao = localizacao;
         this.numeroEntregas = NumeroEntregas;
         this.velocidadeMedia = VelocidadeMedia;
-        this.password = password;
+        this.numeroKms = nrKms;
     }
 
     public Transporte(Transporte a){
-        this.email = a.getReferencia();
+        super(a.getEmail(),a.getReferencia(),a.getNome(),a.getPassword(),a.getMorada(),a.getNif());
         this.disponibilidade = a.isDisponivel();
         this.raio = a.getRaio();
         this.certeficado = a.isCerteficado();
         this.classificacao = a.getClassificacao();
-        this.localizacao = a.getLocalizacao();
         this.numeroEntregas = a.getNumeroEntregas();
         this.velocidadeMedia = a.getVelocidadeMedia();
-        this.password = a.getPassword();
+        this.numeroKms = a.getNumeroKms();
+
     }
 
 
-    public String getReferencia() {
-        return email;
-    }
 
     public boolean isDisponivel() {
         return disponibilidade;
@@ -75,9 +74,6 @@ public abstract class Transporte extends Ator {
         return classificacao;
     }
 
-    public Point2D.Double getLocalizacao() {
-        return localizacao;
-    }
 
     public int getNumeroEntregas() {
         return numeroEntregas;
@@ -87,13 +83,8 @@ public abstract class Transporte extends Ator {
         return velocidadeMedia;
     }
 
-    public String getPassword() {
-        return password;
-    }
 
-    public void setReferencia(String email) {
-        this.email = email;
-    }
+
 
     public void setDisponibilidade(boolean disponibilidade) {
         this.disponibilidade = disponibilidade;
@@ -115,21 +106,26 @@ public abstract class Transporte extends Ator {
         this.classificacao = (classificacao+anterior)/this.getNumeroEntregas();// = k+(x+y+z)/n+1
     }
 
-    public void setLocalizacao(Point2D.Double localizacao) {
-        this.localizacao = localizacao;
 
-    }
 
     public void setNumeroEntregas(int numeroEntregas) {
         this.numeroEntregas = numeroEntregas;
     }
 
 
-    public void setPassword(String password) {
-        this.password = password;
+    public double getNumeroKms() {
+        return numeroKms;
     }
 
-    public abstract Transporte clone();
+    public void setNumeroKms(double numeroKms) {
+        this.numeroKms = numeroKms;
+    }
+
+
+
+
+
+
 
 
     /*metodos*/
@@ -147,29 +143,36 @@ public abstract class Transporte extends Ator {
 
     }
 
-    //public abstract boolean distanciaValida(Encomenda a);
+
 
     public double distancia (Encomenda a){
-       return  a.getMoradaLoja().distance(this.getLocalizacao())+a.getMoradaLoja().distance(a.getMoradaUtilizador());
+       return  a.getMoradaLoja().distance(this.getMorada())+a.getMoradaLoja().distance(a.getMoradaUtilizador());
     }
 
     public boolean distanciaValida(Encomenda a){
-        if (a.getMoradaLoja().distance(this.getLocalizacao())>getRaio()) return false;
+        if (a.getMoradaLoja().distance(this.getMorada())>getRaio()) return false;
         else return true;
+    }
+
+    public void addKms(Encomenda a){
+        double b = this.getNumeroKms();
+        b+=distancia(a);
+        setNumeroKms(b);
+
     }
 
 
 
     public void tempoViagem(Encomenda a) {
 
-    Double tempo = (a.getMoradaLoja().distance(this.getLocalizacao())*60)/this.getVelocidadeMedia();
+    Double tempo = (a.getMoradaLoja().distance(this.getMorada())*60)/this.getVelocidadeMedia();
     Duration duracao = Duration.ofMinutes(tempo.longValue());
 
         a.setTempo(duracao);
-        //a.getData().toLocalTime().plus(duracao);
-        }
-    /*ENCOMENDA ENTREGUE -> TEMPO DE ENTREGA FINALIZADO*/
 
+    }
+
+/*
     public void encomendaEntregue (Encomenda a, Servico s){
         tempoViagem(a);
         s.adicionaEfetuado(a);
@@ -179,9 +182,16 @@ public abstract class Transporte extends Ator {
         this.setDisponibilidade(true);
 
     }
+*/
+
+    /**
+     * outros
+     */
 
 
-
+    public  Transporte clone(){
+        return new Transporte(this);
+    }
 
 
 }

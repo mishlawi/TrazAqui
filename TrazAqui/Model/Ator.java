@@ -1,48 +1,51 @@
 package Model;
 
+import java.awt.geom.Point2D;
 import java.io.Serializable;
+import java.util.Objects;
 
 public abstract class Ator implements Serializable
 {
-    //variaveis de instância
+    /**
+     * Variaveis de instancia
+     */
     private String email;
+    private String referencia;
     private String nome;
     private String password;
-    //private String morada;
-    private String datanascimento;
-    private int nif;
+    private Point2D.Double morada;
+    private long nif;
 
     /**
-     * Constructores
+     * Construtores
      */
     public Ator()
     {
         this.email="";
+        this.referencia = "";
         this.nome="";
         this.password="";
-      //  this.morada="";
-        this.datanascimento="";
+        this.morada= null;
         this.nif=0;
     }
 
-    public Ator(String email,String nome,String password,String morada,String datanascimento,
-                  int nif)
+    public Ator(String email, String referencia,String nome,String password,Point2D.Double morada,long nif)
     {
         this.email=email;
+        this.referencia = referencia;
         this.nome=nome;
         this.password=password;
-      //  this.morada=morada;
-        this.datanascimento=datanascimento;
+        this.morada=morada;
         this.nif=nif;
     }
 
     public Ator(Ator a)
     {
         this.email=a.getEmail();
+        this.referencia = a.getReferencia();
         this.nome=a.getNome();
         this.password=a.getPassword();
-        // this.morada=a.getMorada();
-        this.datanascimento=a.getDataN();
+        this.morada=a.getMorada();
         this.nif=a.getNif();
     }
     /**
@@ -52,6 +55,11 @@ public abstract class Ator implements Serializable
     {
         return this.email;
     }
+
+    public String getReferencia() {
+        return referencia;
+    }
+
     public String getNome()
     {
         return this.nome;
@@ -60,21 +68,12 @@ public abstract class Ator implements Serializable
     {
         return this.password;
     }
-    /*
-    public String getMorada()
-    {
-        return this.morada;
-    }
-    */
-
-    public String getDataN()
-    {
-        return this.datanascimento;
-    }
-    public int getNif ()
+    public Point2D.Double getMorada(){return this.morada;}
+    public long getNif ()
     {
         return this.nif;
     }
+
     /**
      * Setters
      */
@@ -82,6 +81,11 @@ public abstract class Ator implements Serializable
     {
         this.email=email;
     }
+
+    public void setReferencia(String referencia) {
+        this.referencia = referencia;
+    }
+
     public void setNome(String nome)
     {
         this.nome=nome;
@@ -90,28 +94,17 @@ public abstract class Ator implements Serializable
     {
         this.password=password;
     }
-    /*
-    public void setMorada(String morada)
+
+    public void setMorada(Point2D.Double morada)
     {
         this.morada=morada;
     }
-    */
-    public void setDataN(String datanascimento)
-    {
-        this.datanascimento=datanascimento;
-    }
-    public void setNif(int nif)
+    public void setNif(long nif)
     {
         this.nif=nif;
     }
 
-    public boolean equals(Object o)
-    {
-        if(o==this) return true;
-        if(o==null || o.getClass() != this.getClass()) return false;
-        Ator a = (Ator) o;
-        return a.getEmail().equals(this.email) && a.getNif()==this.nif;
-    }
+
 
     public abstract Ator clone();
 
@@ -119,9 +112,26 @@ public abstract class Ator implements Serializable
     {
         StringBuilder sb = new StringBuilder ();
         sb.append("Email: ").append(this.email).append("\nNome: ").append(this.nome)
-                //.append("\nMorada: ").append(this.morada)
-                .append("\nData Nascimento: ").append(this.datanascimento)
+                .append("\nMorada: ").append(this.morada)
                 .append("\nNIF: ").append(this.nif);
         return sb.toString();
+    }
+
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Ator)) return false;
+        Ator ator = (Ator) o;
+        return nif == ator.nif &&
+                email.equals(ator.email) &&
+                referencia.equals(ator.referencia) &&
+                nome.equals(ator.nome) &&
+                password.equals(ator.password) &&
+                morada.equals(ator.morada);
+    }
+
+
+    public int hashCode() {
+        return Objects.hash(email, referencia, nome, password, morada, nif);
     }
 }

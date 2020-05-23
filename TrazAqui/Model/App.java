@@ -1,67 +1,57 @@
-package View;
-
-import Model.TrazAqui;
-import Model.Encomenda;
-import Model.Transporte;
-import Model.User;
+package Model;
 
 import java.io.IOException;
+import java.util.*;
 import java.util.Scanner;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.io.Serializable;
-
-
-
-public class View implements Serializable
+/*
+public class App implements Serializable
 {
-    private View() {}
-    private static TrazAqui dados= new TrazAqui();
+    private App() {}
+    private static TrazAqui dados=new TrazAqui();
     private static Menu principal,cliente,proprietario,escolhaC,showPreco;
 
     private static void carregaMenus(){
-        String [] menuPrincipal =     {"Registar",
+        String [] menuP =     {"Registar",
                 "Login",
-                "Top 10 utilizadores que mais usam o sistema",
-                "Top 10 Empresas Transportadoras com mais kms"};
+                "Top 10 Clientes com mais alugueres",
+                "Top 10 Clientes com mais kms"};
 
         String [] menuCliente ={"Dados pessoais",
-                "Listagem de encomendas",
-                ""};
+                "Listagem de alugueres",
+                "Alugar"};
 
-        String[] menuTransportador = {"Dados pessoais",
-                "Listagem de encomendas",
-                "Minhas Encomendas",
+        String[] menuProp = {"Dados pessoais",
+                "Listagem de alugueres",
+                "Inserir viaturas",
+                "Meus veiculos",
                 "Mostrar total faturado num veiculo",
-                "Pedidos"};
-
-        String[] menuLoja = {"Dados da sua empresa",
-                "Listagem de encomendas",
-                "Minhas Encomendas",
-                "Mostrar total faturado num veiculo",
-                "Pedidos"};
+                "Pedidos aluguer"};
 
 
 
         String [] mshowPreco = {"Total",
                 "Total faturado ",
                 "Total faturado num periodo"};
-
         String [] mescolhaC ={"Sou cliente","Sou proprietario"};
 
-        principal = new Menu(menuPrincipal);
+        principal = new Menu(menuP);
         cliente = new Menu(menuCliente);
-        proprietario = new Menu(menuTransportador);
-        escolhaC= new Menu(mescolhaC);
+        proprietario = new Menu(menuProp);
+        escolhaC=new Menu(mescolhaC);
         showPreco = new Menu(mshowPreco);
     }
     public static void main(String[] args) {
 
 
+        //carregaDados();
         carregaMenus();
         lerDadosGravados();
 
@@ -94,34 +84,38 @@ public class View implements Serializable
         } while(principal.getOp()!= 0);
     }
 
-    public static void encomendar(){
-
-
-        Encomenda encomenda =new Encomenda();
-
+    public static void alugar(){
+        Point2D.Double inicio=new Point2D.Double();
+        Point2D.Double destino=new Point2D.Double();
+        Aluguer al=new Aluguer();
+        double x,y,a,b;
         Scanner input = new Scanner(System.in);
-
-        String x="";
-        System.out.println("1. Indique o nome da loja");
-        x=input.next();
+        String tipo,combustivel;
+        System.out.println("1. Indique onde está coordenada X");
+        x=input.nextDouble();
         System.out.println("2. Indique onde está coordenada Y");
         y=input.nextDouble();
         inicio.setLocation(x,y);
+        System.out.println("1. Indique coordenada X do seu destino");
+        a=input.nextDouble();
+        System.out.println("2. Indique coordenada Y do seu destino");
+        b=input.nextDouble();
+        destino.setLocation(a,b);
         System.out.println("Indique o tipo de combustivel:");
         combustivel=input.nextLine();
         System.out.println("Escolha tipo de viatura:");
         tipo=input.nextLine();
         int opcao;
 
-        dados.setEnc(encomenda); //encomenda a ser tratada
+        dados.setAlu(al);
 
-        dados.defUser();
+        dados.defCliente();
 
         dados.definirCoor(inicio,destino);
 
-
-        System.out.println("1:Escolher transportador mais proximo");
-        System.out.println("2:Escolher  mais barato");
+        String matricula;
+        System.out.println("1:Escolher veiculos mais proximo");
+        System.out.println("2:Escolher veiculos mais baarato");
         System.out.println("Opçao:");
         opcao=input.nextInt();
         if (opcao==1)
@@ -138,22 +132,37 @@ public class View implements Serializable
 
         dados.atualizaData();
 
+
+
+
+
         dados.updateLocalViatCli(destino);
 
-        System.out.println("Classificação a atribuir ao Transportador:");
+        System.out.println("Classificação a atribuir ao veiculo:");
         nota=input.nextInt();
 
-        dados.daClassificacao(nota);
+        dados.addClassProp(matricula,nota);
 
-        dados.add();
+
+
+        //if (dados.getAlu().getAceite()==false){
+
+
+        //dados.addPedido(dados.getAlu());
+        //}
+        //else {
+
+        dados.addRegistoC();
 
         dados.addRegistoV();
 
         dados.addRegistoP();
 
+
         dados.addTotalFaturado();
 
         dados.addKmspercoridos();
+
         // }
         input.close();
     }
@@ -309,8 +318,7 @@ public class View implements Serializable
 
         Scanner input = new Scanner(System.in);
         System.out.println("1. Sou Cliente");
-        System.out.println("2. Sou Transportador");
-        System.out.println("3. Sou Lojista");
+        System.out.println("2. Sou Proprietário");
         op=input.nextInt();
 
         input.nextLine();
@@ -328,18 +336,20 @@ public class View implements Serializable
         System.out.println("Insira a morada: ");
         morada = input.nextLine();
 
-
+        System.out.println("Insira a sua data de nascimento (dd-mm-yyyy)");
+        data = input.nextLine();
         System.out.println("Insira o seu Nif");
         nif = input.nextInt();
 
         if (op==1)
         {
-            User c = new User();
+            Cliente c = new Cliente();
 
             c.setEmail(email);
             c.setNome(nome);
             c.setPassword(password);
             c.setMorada(morada);
+            c.setDataN(data);
             c.setNif(nif);
             try{
                 dados.registarCliente(c);
@@ -352,7 +362,7 @@ public class View implements Serializable
         }
         if (op==2)
         {
-            Transporte p = new Tr();
+            Proprietario p = new Proprietario();
 
             p.setEmail(email);
             p.setNome(nome);
@@ -507,18 +517,18 @@ public class View implements Serializable
     public static void lerDadosGravados()
     {
         try{
-            dados = UMCarroJa.lerDados();
+            dados = TrazAqui.lerDados();
         }
         catch(IOException e){
-            dados = new UMCarroJa();
+            dados = new TrazAqui();
             System.out.println("Não conseguiu ler os dados!.");
         }
         catch(ClassNotFoundException e){
-            dados = new UMCarroJa();
+            dados = new TrazAqui();
             System.out.println("Não conseguiu ler os dados!");
         }
         catch(ClassCastException e){
-            dados = new UMCarroJa();
+            dados = new TrazAqui();
             System.out.println("Não conseguiu ler os dados!");
         }
     }
@@ -712,5 +722,4 @@ public class View implements Serializable
 
 }
 
-
-
+ */
