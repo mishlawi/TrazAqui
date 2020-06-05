@@ -11,8 +11,8 @@ public class EncomendaMedica extends Encomenda {
         super();
     }
 
-    public EncomendaMedica(User comprador, Transporte distribuidor, Loja loja, Point2D.Double moradaOrigem, Point2D.Double moradaDestino, String referencia, float peso, LocalDateTime date, Duration tempo, List<Produto> lst, double custo, boolean efetuada) {
-        super(comprador, distribuidor, loja, moradaOrigem, moradaDestino, referencia, peso, date, tempo, lst, custo, efetuada);
+    public EncomendaMedica(User comprador, Transporte distribuidor, Loja loja, Point2D.Double moradaOrigem, Point2D.Double moradaDestino, String referencia, float peso, LocalDateTime date, Duration tempo, List<Produto> lst, double custo, double custoviagem ,boolean efetuada) {
+        super(comprador, distribuidor, loja, moradaOrigem, moradaDestino, referencia, peso, date, tempo, lst, custo, custoviagem, efetuada);
     }
 
     public EncomendaMedica(Encomenda a) {

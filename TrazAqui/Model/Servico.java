@@ -4,15 +4,15 @@ package Model;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-
+/*
 public class Servico {
     private Map<String, Encomenda> pedidos; //k: referencia da loja, V: Encomenda
     private Map<String, Encomenda> efetuados;
     private TrazAqui trazAqui;
-
+*/
 
     /*Construtores*/
-
+/*
     public Servico() {
         this.pedidos = new HashMap<>();
         this.efetuados = new HashMap<>();
@@ -32,9 +32,9 @@ public class Servico {
         this.trazAqui = s.getDataBase();
     }
 
-
+*/
     /*getters*/
-
+/*
     public Map<String, Encomenda> getPedidos() {
         Map<String, Encomenda> aux = new HashMap<>();
         for (Map.Entry<String, Encomenda> e : this.pedidos.entrySet())
@@ -48,10 +48,10 @@ public class Servico {
             aux.put(e.getKey(), e.getValue().clone());
         return aux;
     }
-
+*/
     /*setters*/
 
-
+/*
     public void setPedidos(Map<String, Encomenda> ped) {
         this.pedidos = new HashMap<>();
         ped.entrySet().forEach(e -> this.pedidos.put(e.getKey(),
@@ -68,13 +68,13 @@ public class Servico {
         return this.trazAqui;
     }
 
-
+*/
     /*Metodos*/
 
 
 
 
-
+/*
 
 }
-
+*/

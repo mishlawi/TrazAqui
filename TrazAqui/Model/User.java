@@ -2,12 +2,15 @@ package Model;
 
 
 import java.awt.geom.Point2D;
-import java.time.LocalDateTime;
-import java.util.List;
+import java.io.Serializable;
+
+import java.util.HashMap;
+
+import java.util.Map;
 
 
-public class User extends Ator {
-
+public class User extends Ator implements Serializable {
+private Map<String,Encomenda> encomendas;
 
     /**
      * Constructores
@@ -15,17 +18,40 @@ public class User extends Ator {
 
     public User() {
         super();
+        encomendas= new HashMap<>();
+
 
     }
 
-    public User(String ref,String email, String nome, String password, Point2D.Double morada, long nif) {
+    public User(String ref,String email, String nome, String password, Point2D.Double morada, long nif, Map<String,Encomenda> encomendas) {
         super(email, ref, nome, password,morada ,nif );
-
+        encomendas = encomendas;
     }
 
     public User(User a) {
         super(a.getEmail(),a.getReferencia(),a.getNome(),a.getPassword(),a.getMorada(),a.getNif());
+        encomendas = a.getEncomendas();
 
+    }
+
+
+    public Map<String,Encomenda> getEncomendas(){
+        Map<String,Encomenda> aux = new HashMap<>();
+        for(Map.Entry<String,Encomenda> e:this.encomendas.entrySet())
+            aux.put(e.getKey(),e.getValue());
+        return aux;
+
+    }
+
+
+    public void setEncomendas(Map<String,Encomenda>enc){
+        this.encomendas = new HashMap<>();
+        enc.entrySet().forEach(e-> this.encomendas.put(e.getKey(),
+                e.getValue().clone()));
+    }
+
+    public void adicionaEncomendaUser(Encomenda e) {
+        this.encomendas.put(e.getReferencia(),e.clone());
     }
 
 
@@ -39,32 +65,12 @@ public class User extends Ator {
     /**
      * Metodos
      */
-
-
-
-    public void setEncomenda(Loja lj,List<Produto> p, User u, Loja l, Transporte t, float peso){
-        Encomenda a = new Encomenda();
-        a.setMoradaUtilizador(this.getMorada());
-        a.setMoradaLoja(lj.getMorada());
-        a.setLoja(l);
-        a.setComprador(u);
-        a.setProdutos(p);
-        a.setData(LocalDateTime.now()); //data e hora do pedido
-        a.setPeso(peso);
-       // geraReferencia(a,t);
-
+    @Override
+    public String toString() {
+        return "User{" +
+                "encomendas=" + encomendas +
+                '}';
     }
-
-
-    public void geraReferencia(Encomenda a, TrazAqui t){
-        StringBuilder sb = new StringBuilder();
-        int sizeMap = t.getEncomendas().size();
-
-        while(t.getEncomendas().containsKey((sb.append("e"+ sizeMap)).toString()))
-            sizeMap++;
-            a.setReferencia((sb.append("e" + sizeMap).toString()));
-    }
-
 
 
 

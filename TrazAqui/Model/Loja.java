@@ -1,9 +1,10 @@
 package Model;
 
 import java.awt.geom.Point2D;
+import java.io.Serializable;
 import java.util.*;
 
-public class Loja extends Ator {
+public class Loja extends Ator implements Serializable {
 
 
     //Variáveis de instância
@@ -11,8 +12,9 @@ public class Loja extends Ator {
     private String referencia;
     private int fila;
     private float espera; //tempo médio de espera por cliente
-    private List<Encomenda> encomendas;
-    private Servico servico;
+    private Map<String,Encomenda> encomendas;
+    private List<Produto> produtos;
+
 
 
 
@@ -21,18 +23,18 @@ public class Loja extends Ator {
         this.referencia = "";
         this.fila = 0;
         this.espera = 0;
-        this.encomendas = new ArrayList<>();
-        this.servico = new Servico();
+        this.encomendas = new HashMap<>();
+
     }
 
 
-    public Loja(String nome,String referencia, Point2D.Double moradaLoja, int fila, float espera, List<Encomenda> enc, Servico s) {
+    public Loja(String nome,String referencia, Point2D.Double moradaLoja, int fila, float espera, Map<String,Encomenda> enc) {
 
         this.referencia =  referencia;
         this.fila = fila;
         this.espera = espera;
         this.encomendas = enc;
-        this.servico = s;
+
     }
 
     public Loja (Loja a) {
@@ -40,8 +42,8 @@ public class Loja extends Ator {
     setReferencia(a.getReferencia());
     setFila(a.getFila());
     setEspera(a.getEspera());
-    this.encomendas = a.getPedidos();
-    this.servico = a.getServico();
+    this.encomendas = a.getEncomendas();
+
     }
 
 
@@ -73,23 +75,37 @@ public class Loja extends Ator {
         this.espera = espera;
     }
 
-    public Servico getServico() {
-        return servico;
+    public Map<String,Encomenda> getEncomendas(){
+        Map<String,Encomenda> aux = new HashMap<>();
+        for (Map.Entry<String,Encomenda> e : this.encomendas.entrySet())
+            aux.put(e.getKey(),e.getValue().clone());
+        return aux;
     }
+
+    public void setEncomendas(Map<String,Encomenda>enc){
+        this.encomendas = new HashMap<>();
+        enc.entrySet().forEach(e-> this.encomendas.put(e.getKey(),
+                e.getValue().clone()));
+    }
+
+    @Override
+    public String toString() {
+        return super.toString()  +
+                ", fila=" + fila +
+                ", espera=" + espera +
+                ", encomendas=" + encomendas +
+                ", produtos=" + produtos
+                ;
+    }
+
 
     /*Metodos*/
 
-    /*basicamente retira todos os pedidos existentes para esta loja */
 
-    public List<Encomenda> getPedidos(){
-    Map<String,Encomenda> aux = this.servico.getDataBase().getEncomendas();
-    List <Encomenda> res = new ArrayList<>();
-        for(Map.Entry<String,Encomenda> e: aux.entrySet()){
-                if(e.getValue().getLoja().equals(this.referencia))
-                    res.add(e.getValue().clone());
-        }
-    return res;
+    public void adicionaEncomendaLoja(Encomenda e) {
+        this.encomendas.put(e.getReferencia(),e.clone());
     }
+
 
 
     public Loja clone(){

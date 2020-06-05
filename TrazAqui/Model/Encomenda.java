@@ -2,32 +2,29 @@ package Model;
 
 import java.awt.geom.Point2D;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class Encomenda
+public class Encomenda implements Serializable
 {
      //Variáveis de instância
     private User comprador; //vai ter o email do utilizador
     private Transporte distribuidor; //vai ter o email da empresa/voluntario que efetuou a ecomenda
     private Loja loja; //email da loja a que foi comprado
-    private Point2D.Double moradaLoja; //morada origem é morada da loja
-    private Point2D.Double moradaUtilizador; // morada destino é morada do utilizador
     private String referencia;
     private float peso;
     private LocalDateTime data; //DD-MM-AA H:M:S a que a encomenda foi feita
     private Duration tempo; //tempo que demorou o transporte de uma entrega
     private List<Produto> produtos;
-    private double custo;
+    private double custoProdutos;
+    private double custoTransporte;
     private boolean efetuada;
 
-
-
-    
     //Construtores
     
     public Encomenda(){
@@ -35,47 +32,43 @@ public class Encomenda
         this.comprador = new User();
         this.distribuidor = new Transporte();
         this.loja = new Loja();
-        this.moradaLoja=null;
-        this.moradaUtilizador=null;
         this.referencia="";
         this.peso=0;
         this.data=null;//LocalDate.now();
         this.tempo=null;
         this.produtos = new ArrayList<>();
-        this.custo = 0;
+        this.custoProdutos = 0;
+        this.custoTransporte =0;
         this.efetuada = false;
 
     }
     
-    public Encomenda(User comprador, Transporte distribuidor, Loja loja, Point2D.Double moradaLoja, Point2D.Double moradaUtilizador, String referencia, float peso, LocalDateTime date, Duration tempo, List<Produto> lst,double custo, boolean efetuada){
+    public Encomenda(User comprador, Transporte distribuidor, Loja loja, Point2D.Double moradaLoja, Point2D.Double moradaUtilizador, String referencia, float peso, LocalDateTime date, Duration tempo, List<Produto> lst,double custoProdutos, double custoTransporte, boolean efetuada){
        this.comprador = comprador;
        this.distribuidor = distribuidor;
        this.loja = loja;
-       this.moradaLoja=moradaLoja;
-       this.moradaUtilizador=moradaUtilizador;
        this.referencia=referencia;
        this.peso=peso;
        this.data = date;
        this.tempo = tempo;
        setProdutos(lst);
-       this.custo = custo;
+       this.custoProdutos = custoProdutos;
+       this.custoTransporte = custoTransporte;
        this.efetuada = efetuada;
     }
-
 
 
     public Encomenda(Encomenda a){
        this.distribuidor = a.getDistribuidor();
        this.comprador = a.getComprador();
        this.loja = a.getLoja();
-       this.moradaLoja=a.getMoradaLoja();
-       this.moradaUtilizador=a.getMoradaUtilizador();
        this.referencia=a.getReferencia();
        this.peso=a.getPeso();
        this.data = a.getData();
        this.tempo = a.getTempo();
        this.produtos=a.getProdutos();
-       this.custo = a.getCusto();
+       this.custoProdutos = a.getCusto();
+       this.custoTransporte = a.getCustoTransporte();
        this.efetuada = a.isEfetuada();
 
     }
@@ -91,13 +84,6 @@ public class Encomenda
 
     public Loja getLoja(){return this.loja; }
 
-    public Point2D.Double getMoradaLoja(){
-        return this.moradaLoja;
-    }
-    
-    public Point2D.Double getMoradaUtilizador(){
-        return this.moradaUtilizador;
-    }
     
     public String getReferencia(){
         return this.referencia;
@@ -124,7 +110,11 @@ public class Encomenda
     }
 
     public double getCusto() {
-        return custo;
+        return custoProdutos;
+    }
+
+    public double getCustoTransporte(){
+        return custoTransporte;
     }
 
     public boolean isEfetuada() {
@@ -133,10 +123,6 @@ public class Encomenda
 
     public void setData(LocalDateTime data) {
         this.data = data;
-    }
-
-    public void setMoradaLoja(Point2D.Double moradaLoja){
-        this.moradaLoja=moradaLoja;
     }
 
     public void setComprador(User comprador) {
@@ -155,10 +141,6 @@ public class Encomenda
         this.tempo = tempo;
     }
 
-    public void setMoradaUtilizador(Point2D.Double moradaUtilizador){
-        this.moradaUtilizador=moradaUtilizador;
-    }
-    
     public void setReferencia(String referencia){
         this.referencia=referencia;
     }
@@ -174,62 +156,82 @@ public class Encomenda
         this.produtos.add(p.clone());
     }
 
+    public void setEfetuada(boolean efetuada) {
+        this.efetuada = efetuada;
+    }
+
+    public void setCustoTransporte(double custoTransporte) {
+        this.custoTransporte = custoTransporte;
+    }
+
     /*metodos*/
 
-    public double setCusto(){
+    public void setCusto(){
         ArrayList<Double> aux = new ArrayList<>();
         for(Produto p:this.getProdutos())
             aux.add(p.getPreco());
         double sum = 0;
         for(Double d : aux)
             sum += d;
-        return sum;
-    }
-
-/*VER*/
-
-
-    private void geraReferencia(){
-
+        this.custoProdutos= sum;
     }
 
 
+    public void DefineEncomenda(List<Produto> p, User u, Loja l, Transporte t, float peso){
 
-     public boolean equals(Object o){
-        if(this == o)
-        return true;
-        if((o==null) || (o.getClass() != this.getClass())) 
-        return false;
-        else{
-        Encomenda a = (Encomenda) o;
-        return this.distribuidor.equals(a.getDistribuidor())
-                && this.comprador.equals(a.getComprador())
-                && this.moradaLoja == a.getMoradaLoja()
-                && this.moradaUtilizador == a.getMoradaUtilizador()
-                && this.referencia.equals(a.getReferencia())
-                && this.peso == a.getPeso();
+        this.setLoja(l);
+        this.setDistribuidor(t);
+        this.setComprador(u);
+        this.setProdutos(p);
+        this.setData(LocalDateTime.now()); //data e hora do pedido
+        this.setPeso(peso);
 
-        }
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Encomenda)) return false;
+        Encomenda encomenda = (Encomenda) o;
+        return Float.compare(encomenda.peso, peso) == 0 &&
+                Double.compare(encomenda.custoProdutos, custoProdutos) == 0 &&
+                efetuada == encomenda.efetuada &&
+                comprador.equals(encomenda.comprador) &&
+                distribuidor.equals(encomenda.distribuidor) &&
+                loja.equals(encomenda.loja) &&
+                referencia.equals(encomenda.referencia) &&
+                data.equals(encomenda.data) &&
+                tempo.equals(encomenda.tempo) &&
+                produtos.equals(encomenda.produtos);
+    }
 
-    public String toString(){
-        StringBuffer sb = new StringBuffer();
+    @Override
+    public int hashCode() {
+        return Objects.hash(comprador, distribuidor, loja, referencia, peso, data, tempo, produtos, custoProdutos, efetuada);
+    }
 
-        sb.append("Referência de Origem"); sb.append(this.getDistribuidor()+"\n");
-        sb.append("Referência do Destino"); sb.append(this.getComprador()+"\n");
-        sb.append("Morada de Origem: "); sb.append(this.getMoradaLoja()+"\n");
-        sb.append("Morada de Destino: "); sb.append(this.getMoradaUtilizador()+"\n");
-        sb.append("Referência: "); sb.append(this.getReferencia()+"\n");
-        sb.append("Peso: "); sb.append(this.getPeso()+"\n");
-        sb.append ("Data da encomenda: "); sb.append(this.getData()+"\n");
-
-
-        return sb.toString();
+    @Override
+    public String toString() {
+        return "Encomenda{" +
+                "comprador=" + comprador +
+                ", distribuidor=" + distribuidor +
+                ", loja=" + loja +
+                ", referencia='" + referencia + '\'' +
+                ", peso=" + peso +
+                ", data=" + data +
+                ", tempo=" + tempo +
+                ", produtos=" + produtos +
+                ", custoProdutos=" + custoProdutos +
+                ", custoTransporte=" + custoTransporte +
+                ", efetuada=" + efetuada +
+                '}';
     }
 
     public Encomenda clone(){
         return new Encomenda(this);
     }
+
+
+
 }

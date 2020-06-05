@@ -3,10 +3,14 @@ package Model;
 import java.io.*;
 
 
+import java.lang.reflect.Array;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.chrono.ChronoLocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class TrazAqui {
+public class TrazAqui implements Serializable{
 
 
 
@@ -196,8 +200,35 @@ public class TrazAqui {
     return aux;
     }
 
+    public List<EmpresaTransportadora> empresasOrdenadasCusto(){
+        Set<EmpresaTransportadora> res = new TreeSet<>(new ComparatorTaxa());
+        for(Transporte a : this.transporte.values()){
+            if(a instanceof EmpresaTransportadora){
+                EmpresaTransportadora e = (EmpresaTransportadora) a;
+            res.add(e.clone());
+            }
+        }
+
+        return res.stream().collect(Collectors.toList());
+    }
+
+    public EmpresaTransportadora empresaMaisBarata(){
+        List<EmpresaTransportadora> emp = empresasOrdenadasCusto();
+        int n = emp.size()-1;
+        EmpresaTransportadora e = emp.get(n);
+        return e;
+    }
 
 
+    public void adicionaTransportador(Transporte t) {
+        this.transporte.put(t.getReferencia(),t.clone());
+    }
+    public void adicionaUser(User t) {
+        this.users.put(t.getReferencia(),t.clone());
+    }
+    public void adicionaLoja(Loja j) {
+        this.lojas.put(j.getReferencia(), j.clone());
+    }
 
     public List<Encomenda> getEncomendasNaoEfetuadas()
     {
@@ -239,13 +270,16 @@ public class TrazAqui {
      * encomenda
      */
 
-    public void defUser(){
-        getEncomenda().setComprador(this.userIn);
+    public void defUserEncomenda(){
+        this.encomenda.setComprador(this.userIn);
     }
 
-    public void adicionaPedido(Encomenda e) {
+    public void adicionaEncomenda(Encomenda e) {
         this.encomendas.put(e.getReferencia(),e.clone());
     }
+
+
+
 
 
 
@@ -255,28 +289,29 @@ public class TrazAqui {
      */
 
 
+
     public void RegistaLoja (Loja l) throws MailRegistadoException {
-        if (this.getLojas().containsKey(l.getEmail())) throw new MailRegistadoException("Email já registado");
-        this.getLojas().put(l.getEmail(), l.clone());
+        if (this.getLojas().containsKey(l.getReferencia())) throw new MailRegistadoException("Email já registado");
+        this.lojas.put(l.getReferencia(), l.clone());
     }
 
 
     public void registarUtilizador(User c)throws MailRegistadoException
     {
-        if (this.getUsers().containsKey(c.getEmail())) throw new MailRegistadoException("Email já registado");
-        this.getUsers().put(c.getEmail(), c.clone());
+        if (this.getUsers().containsKey(c.getReferencia())) throw new MailRegistadoException("Email já registado");
+        this.users.put(c.getReferencia(), c.clone());
     }
 
     public void registarVoluntario (Voluntario v) throws MailRegistadoException
     {
-        if(this.getTransportador().containsKey(v.getEmail())) throw new MailRegistadoException("Email já registado");
-        this.getTransportador().put(v.getEmail(), v.clone());
+        if(this.getTransportador().containsKey(v.getReferencia())) throw new MailRegistadoException("Email já registado");
+        this.transporte.put(v.getReferencia(), v.clone());
     }
 
     public void registarEmpresa (EmpresaTransportadora e) throws MailRegistadoException
     {
-        if(this.getTransportador().containsKey(e.getEmail())) throw new MailRegistadoException("Email já registado");
-        this.getTransportador().put(e.getEmail(), e.clone());
+        if(this.getTransportador().containsKey(e.getReferencia())) throw new MailRegistadoException("Email já registado");
+        this.transporte.put(e.getReferencia(), e.clone());
     }
 
     /**
@@ -323,8 +358,92 @@ public class TrazAqui {
 
 
     /**
-     * metodos
+     * metodos com Datas
      */
+
+    //encomendas pedidas por ordem
+    public List<Encomenda> encGlobaisData(){
+        return this.encomendas.values().stream().sorted(new DataComparator()).collect(Collectors.toList());
+    }
+
+    public double totalFaturadoPeriodo(String referencia, LocalDate data){
+        List<Encomenda> a = encGlobaisData().stream().filter(e->e.getDistribuidor().getReferencia().equals(referencia)).filter(e->e.getData().toLocalDate().isBefore(data)).sorted(new DataComparator()).collect(Collectors.toList());
+        double res=0;
+        for(Encomenda e : a){
+            res+=e.getCustoTransporte();
+        }
+    return res;
+    }
+
+
+
+
+    public Map<LocalDate,List<Encomenda>> encPorDatas(Map<String,Encomenda> aux ){
+//
+        Map<LocalDate,List<Encomenda>> time = new HashMap<>();
+
+        for(Map.Entry<String,Encomenda> e: aux.entrySet()){
+            if(time.containsKey(e.getValue().getData().toLocalDate())){
+                List<Encomenda> a = new ArrayList<>();
+                a = time.get(e.getValue().getData().toLocalDate());
+                a.add(e.getValue().clone());
+                time.put(e.getValue().getData().toLocalDate(),a);
+            }
+            else{
+                List<Encomenda> a = new ArrayList<>();
+                a.add(e.getValue().clone());
+                time.put(e.getValue().getData().toLocalDate(),a);
+            }
+        }
+        return time;
+    }
+
+
+
+//mostra a lista de encomendas num dado periodo
+    public void showEncomenda(LocalDate data, LocalDate data2, int x) {
+        List<Encomenda> res = new ArrayList<>();
+        if (x == 1) {
+            for (Map.Entry<LocalDate, List<Encomenda>> entry : this.encPorDatas(getClienteIn().getEncomendas()).entrySet()) {
+                if (entry.getKey().equals(data) || entry.getKey().equals(data2) || entry.getKey().isAfter(data) || entry.getKey().isBefore(data2)) {
+                    Iterator<Encomenda> it = entry.getValue().iterator();
+                    while (it.hasNext()) {
+                        Encomenda l = it.next();
+                        res.add(l.clone());
+                        System.out.println(l.toString());
+                    }
+
+                }
+
+            }
+        }
+        if (x == 2)
+            for (Map.Entry<LocalDate, List<Encomenda>> entry : this.encPorDatas(getEmpresaIn().getEncomendas()).entrySet()) {
+                if (entry.getKey().equals(data) || entry.getKey().equals(data2) || entry.getKey().isAfter(data) || entry.getKey().isBefore(data2)) {
+                    Iterator<Encomenda> it = entry.getValue().iterator();
+                    while (it.hasNext()) {
+                        Encomenda l = it.next();
+                        res.add(l.clone());
+                        System.out.println(l.toString());
+                    }
+
+                }
+            }
+        else {
+            for (Map.Entry<LocalDate, List<Encomenda>> entry : this.encPorDatas(getVoluntarioIn().getEncomendas()).entrySet()) {
+                if (entry.getKey().equals(data) || entry.getKey().equals(data2) || entry.getKey().isAfter(data) || entry.getKey().isBefore(data2)) {
+                    Iterator<Encomenda> it = entry.getValue().iterator();
+                    while (it.hasNext()) {
+                        Encomenda l = it.next();
+                        res.add(l.clone());
+                        System.out.println(l.toString());
+                    }
+
+                }
+            }
+
+        }
+    }
 
     public List<EmpresaTransportadora> top10Kms(){
         return getEmpresaTransporte().values().stream()
@@ -349,6 +468,17 @@ public class TrazAqui {
         return users;
         }
 
+    /*basicamente retira todos os pedidos existentes para esta loja */
+
+    public List<Encomenda> getPedidos(){
+        Map<String,Encomenda> aux = this.getEncomendas();
+        List <Encomenda> res = new ArrayList<>();
+        for(Map.Entry<String,Encomenda> e: aux.entrySet()){
+            if(e.getValue().getLoja().equals(this.getLojaIn().getReferencia()))
+                res.add(e.getValue().clone());
+        }
+        return res;
+    }
 
 
 
@@ -367,12 +497,12 @@ public class TrazAqui {
 
 
     //filtra os voluntarios disponiveis e que conseguem fazer a entrega nas moradas da encomenda
-    public Map<String, Voluntario> EncomendaVoluntarios(Encomenda a) {
-        Map<String, Voluntario> aux = new HashMap<>();
+    private Map<String, Transporte> EncomendaVoluntarios(Encomenda a) {
+        Map<String, Transporte> aux = new HashMap<>();
 
         for (Map.Entry<String, Transporte> e : getTransportador().entrySet()) {
             if (e.getValue() instanceof Voluntario) {
-                Voluntario ep = (Voluntario) e.getValue();
+                Transporte ep = e.getValue();
                 if (ep.isDisponivel() && ep.distanciaValida(a)) aux.put(e.getKey(), ep.clone());
             }
         }
@@ -381,7 +511,7 @@ public class TrazAqui {
     }
 
     //filtra os transportadores disponiveis e que conseguem fazer a entrega nas moradas da encomenda
-    public Map<String, Transporte> EncomendaTransporte(Encomenda a) {
+    private Map<String, Transporte> EncomendaTransporte(Encomenda a) {
         Map<String, Transporte> aux = new HashMap<>();
 
         for (Map.Entry<String, Transporte> e : getTransportador().entrySet()) {
@@ -393,12 +523,14 @@ public class TrazAqui {
         return aux;
     }
 
-    //escolhe o transportador ( voluntario ou empresa) que percorre menos distancia ate a
-    public Transporte sortEncomendaTransporte(Encomenda a, Map<String, Transporte> map1) {
+    //escolhe o transportador ( voluntario ou empresa) que percorre menos distancia ate à encomenda a
+    public Transporte sortEncomendaTransporte(Encomenda a) {
+
+        Map<String, Transporte> map1 = EncomendaTransporte(a);
         String aux = "";
         double distancia = 0;
         for (Map.Entry<String, Transporte> e : map1.entrySet()) {
-            if (e.getValue().distancia(a) > distancia) {
+            if (e.getValue().distancia(this.getEncomenda().clone()) > distancia) {
                 distancia = e.getValue().distancia(a);
                 aux = e.getKey();
             }
@@ -406,17 +538,106 @@ public class TrazAqui {
         return map1.get(aux);
     }
 
+    public Transporte sortEncomendaVoluntario(Encomenda a) {
+
+        Map<String, Transporte> map1 = EncomendaVoluntarios(a);
+        String aux = "";
+        double distancia = 0;
+        for (Map.Entry<String, Transporte> e : map1.entrySet()) {
+            if (e.getValue().distancia(this.getEncomenda().clone()) > distancia) {
+                distancia = e.getValue().distancia(a);
+                aux = e.getKey();
+            }
+        }
+        return map1.get(aux);
+    }
+
+
     public void daClassificacao(int classificacao){
-        String classificado = this.getEncomenda().getDistribuidor().getEmail();
+        String classificado = this.getEncomenda().getDistribuidor().getReferencia();
         this.getTransportador().get(classificado).setClassificacao(classificacao);
     }
 
 
+    public void geraReferenciaEncomenda(Encomenda a){
+        StringBuilder sb = new StringBuilder();
+        int sizeMap = this.getEncomendas().size();
+
+        while(this.getEncomendas().containsKey((sb.append("e"+ sizeMap)).toString()))
+            sizeMap++;
+        a.setReferencia((sb.append("e" + sizeMap).toString()));
+    }
+
+    //basicamente trata da encomenda
+    public void addEncomendaEmpresa(){
+
+        Encomenda e = this.getEmpresaIn().encPedidasData().get(0);
+        EmpresaTransportadora t = getEmpresaTransporte().get(e.getDistribuidor().getReferencia());
+        t.aceitaEncomenda(e); //diz que esta ocupado numa entrega
+        e.setEfetuada(true);
+        t.addKms(e);
+        t.addFatura(e);
+        e.setTempo(t.tempoViagem(e));
+        adicionaTransportador(t);
+        t.adicionaEncomendaTransporte(e);
+        adicionaEncomenda(e); //atualiza registo da encomenda global
+        e.setCustoTransporte(t.defineCusto(e));
+        this.setEmpresaIn(t);
+    }
+
+    public void addEncomendaVoluntario(){
+        Encomenda e = this.getEmpresaIn().encPedidasData().get(0);
+        Voluntario t = getVoluntariosTransporte().get(e.getDistribuidor().getReferencia());
+        t.aceitaEncomenda(e); //diz que esta ocupado numa entrega
+        e.setEfetuada(true); //diz que a efetuou
+        t.addKms(e); //adiciona kms
+        e.setTempo(t.tempoViagem(e)); //tempo da viagem
+        t.adicionaEncomendaTransporte(e);
+        adicionaTransportador(t); //atualiza os seus dados no map de transportadores
+        this.setVoluntarioIn(t);
+    }
+
+
+    /**
+     * Guardar encomendas nos registos individuais
+     */
+
+    public void addRegistoC ()
+    {
+
+        String email=this.encomenda.getComprador().getEmail();
+        this.users.get(email).adicionaEncomendaUser(this.encomenda);
+    }
+    public void addRegistoT ()
+    {
+        String email=this.encomenda.getDistribuidor().getEmail();
+        this.transporte.get(email).adicionaEncomendaTransporte(this.encomenda);
+    }
+    public void addRegistoL ()
+    {
+        String email=this.encomenda.getLoja().getEmail();
+        this.lojas.get(email).adicionaEncomendaLoja(this.encomenda);
+    }
+
+    public User ShowDadosU()
+    {
+        return this.userIn.clone();
+    }
+    public EmpresaTransportadora ShowDadosE()
+    {
+        return this.empresaIn.clone();
+    }
+
+    public Voluntario ShowDadosV()
+    {
+        return this.voluntarioIn.clone();
+    }
 
     /**
 Carregamento de dados
  **/
     public static TrazAqui lerDados() throws IOException, ClassNotFoundException{
+        System.out.println("Working Directory = " + System.getProperty("user.dir"));
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream("TrazAqui.data"));
         TrazAqui db = (TrazAqui) ois.readObject();
         ois.close();
@@ -431,6 +652,10 @@ Carregamento de dados
         oos.flush();
         oos.close();
     }
+
+
+
+
 
 }
 

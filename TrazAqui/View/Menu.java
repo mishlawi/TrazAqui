@@ -47,6 +47,7 @@ public class Menu implements Serializable
     private int escolherOp( )
     {
         int op;
+
         Scanner in = new Scanner(System.in);
         System.out.println("Opcao:");
         op = in.nextInt();

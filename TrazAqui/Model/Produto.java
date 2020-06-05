@@ -1,15 +1,18 @@
 package Model;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Produto {
+public class Produto implements Serializable {
 
+    private String referencia;
     private String nome;
-    private int quantidade;
+    private float quantidade;
     private double preco;
     private boolean medicinal;
 
     public Produto(){
+        this.referencia = "";
         this.nome= new String();
         this.quantidade= 0;
         this.preco = 0;
@@ -17,7 +20,8 @@ public class Produto {
     }
 
 
-    public Produto(String nome, int quantidade, double preco ,boolean medicinal) {
+    public Produto(String referencia, String nome, float quantidade, double preco ,boolean medicinal) {
+        this.referencia = referencia;
         this.nome = nome;
         this.quantidade = quantidade;
         this.preco = preco;
@@ -25,6 +29,7 @@ public class Produto {
     }
 
     public Produto(Produto a){
+        this.referencia = a.getReferencia();
         this.nome = a.getNome();
         this.quantidade = a.getQuantidade();
         this.preco = a.getPreco();
@@ -32,6 +37,12 @@ public class Produto {
     }
 
     //GETTER AND SETTER
+
+
+    public String getReferencia() {
+        return referencia;
+    }
+
     public String getNome() {
         return nome;
     }
@@ -40,12 +51,12 @@ public class Produto {
         this.nome = nome;
     }
 
-    public int getQuantidade() {
+    public float getQuantidade() {
         return quantidade;
     }
 
 
-    public void setQuantidade(int quantidade) {
+    public void setQuantidade(float quantidade) {
         this.quantidade = quantidade;
     }
 
@@ -65,7 +76,9 @@ public class Produto {
         this.medicinal = medicinal;
     }
 
-
+    public void setReferencia(String referencia) {
+        this.referencia = referencia;
+    }
 
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -76,18 +89,15 @@ public class Produto {
                 nome.equals(produto.nome);
     }
 
+    @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
-
-        sb.append("Nome produto: ");
-        sb.append(this.getNome() + "\n");
-        sb.append("Quantidade: ");
-        sb.append(this.getQuantidade() + "\n");
-        sb.append("Uso Medicinal? ");
-        sb.append(this.isMedicinal() + "\n");
-
-        return sb.toString();
-
+        return "Produto{" +
+                "referencia='" + referencia + '\'' +
+                ", nome='" + nome + '\'' +
+                ", quantidade=" + quantidade +
+                ", preco=" + preco +
+                ", medicinal=" + medicinal +
+                '}';
     }
 
     public Produto clone()

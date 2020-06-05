@@ -1,5 +1,7 @@
 package Model;
 
+import View.Menu;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.Scanner;

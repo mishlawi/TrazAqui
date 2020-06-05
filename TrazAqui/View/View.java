@@ -1,35 +1,38 @@
 package View;
 
-import Model.TrazAqui;
-import Model.Encomenda;
-import Model.Transporte;
-import Model.User;
+import Model.*;
+import jdk.swing.interop.SwingInterOpUtils;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.Scanner;
+import java.time.Duration;
+import java.util.*;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import java.io.Serializable;
 
+import static java.lang.Double.parseDouble;
+import static java.lang.Float.parseFloat;
+import static java.lang.Long.parseLong;
 
 
-public class View implements Serializable
-{
-    private View() {}
-    private static TrazAqui dados= new TrazAqui();
-    private static Menu principal,cliente,proprietario,escolhaC,showPreco;
+public class View implements Serializable {
+    private View() {
+    }
 
-    private static void carregaMenus(){
-        String [] menuPrincipal =     {"Registar",
+    private static TrazAqui dados = new TrazAqui();
+    private static Menu principal, cliente, transportador, loja, escolhaC, showPreco;
+
+    private static void carregaMenus() {
+        String[] menuPrincipal = {"Registar",
                 "Login",
                 "Top 10 utilizadores que mais usam o sistema",
                 "Top 10 Empresas Transportadoras com mais kms"};
 
-        String [] menuCliente ={"Dados pessoais",
+        String[] menuCliente = {"Dados pessoais",
                 "Listagem de encomendas",
                 ""};
 
@@ -46,36 +49,38 @@ public class View implements Serializable
                 "Pedidos"};
 
 
-
-        String [] mshowPreco = {"Total",
+        String[] mshowPreco = {"Total",
                 "Total faturado ",
                 "Total faturado num periodo"};
 
-        String [] mescolhaC ={"Sou cliente","Sou proprietario"};
+        String[] mescolhaC = {"Sou cliente", "Sou proprietario"};
 
         principal = new Menu(menuPrincipal);
         cliente = new Menu(menuCliente);
-        proprietario = new Menu(menuTransportador);
-        escolhaC= new Menu(mescolhaC);
+        transportador = new Menu(menuTransportador);
+        loja = new Menu(menuLoja);
+        escolhaC = new Menu(mescolhaC);
         showPreco = new Menu(mshowPreco);
     }
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws IOException {
 
 
+        carregaDados();
+        dados.gravar();
         carregaMenus();
         lerDadosGravados();
 
 
-        do{
+        do {
             principal.executa();
-            try{
+            try {
                 dados.gravar();
-            }
-            catch(IOException e){
-                System.out.println("Falha gravar estado");
+            } catch (IOException e) {
+                System.out.println("Falha gravar estado 1");
             }
 
-            switch(principal.getOp()){
+            switch (principal.getOp()) {
                 case 1:
                     inclui();
                     break;
@@ -91,165 +96,199 @@ public class View implements Serializable
                 default:
                     System.out.println("Opção inválida.");
             }
-        } while(principal.getOp()!= 0);
+        } while (principal.getOp() != 0);
     }
 
-    public static void encomendar(){
+    public static void encomendar() {
 
 
-        Encomenda encomenda =new Encomenda();
+        Encomenda encomenda = new Encomenda();
 
         Scanner input = new Scanner(System.in);
 
-        String x="";
-        System.out.println("1. Indique o nome da loja");
-        x=input.next();
-        System.out.println("2. Indique onde está coordenada Y");
-        y=input.nextDouble();
-        inicio.setLocation(x,y);
-        System.out.println("Indique o tipo de combustivel:");
-        combustivel=input.nextLine();
-        System.out.println("Escolha tipo de viatura:");
-        tipo=input.nextLine();
-        int opcao;
+        String x;
+        System.out.println("1. Indique a referencia da loja");
+        x = input.next();
+        Loja loja = dados.getLojas().get(x);
+
+
+        int produtos;
+        List<Produto> prod = new ArrayList<>();
+
+        System.out.println("Número de produtos que vai comprar");
+        produtos = input.nextInt();
+        int i = 0;
+
+        while (i < produtos) {
+            Produto p = new Produto();
+            String nome, med;
+            int quantidade;
+            double preco;
+
+            System.out.println("");
+
+            System.out.println("Nome do produto");
+            nome = input.nextLine();
+            System.out.println("Quantidade:");
+            quantidade = input.nextInt();
+            System.out.println("Preco do produto:");
+            preco = input.nextDouble();
+            System.out.println("Produto Medicinal? (S/N)");
+            med = input.nextLine();
+            //if (med.equals("S")) p = new Produto(nome,quantidade,preco,true);
+            // if (med.equals("N")) p = new Produto(nome,quantidade,preco,false);
+            //else break;
+            prod.add(p);
+            i++;
+        }
+
+        encomenda.setCusto();
+
+        System.out.println("Produtos adicionados com sucesso");
 
         dados.setEnc(encomenda); //encomenda a ser tratada
 
-        dados.defUser();
-
-        dados.definirCoor(inicio,destino);
-
-
+        int opcao;
         System.out.println("1:Escolher transportador mais proximo");
-        System.out.println("2:Escolher  mais barato");
+        System.out.println("2:Escolher Voluntario");
+        System.out.println("3:Escolher Empresa mais barata");
         System.out.println("Opçao:");
-        opcao=input.nextInt();
-        if (opcao==1)
-            matricula=dados.veiMaisProx(inicio,destino,tipo);
-        else matricula=dados.veiMaisBarato(destino, tipo);
-        if (dados.TemAutonomia()==true) System.out.println("O veiculo tem autonomia suficiente");
+        opcao = input.nextInt();
+        Transporte transportador = new Transporte();
+        if (opcao == 1)
+            transportador = dados.sortEncomendaTransporte(encomenda); //transportador mais proximo
+        if (opcao == 2) transportador = dados.sortEncomendaVoluntario(encomenda); //voluntario mais proximo
+        //if (opcao==3)
 
+        float peso;
+        System.out.println("Indique o peso aproximado da sua encomenda");
+        peso = input.nextFloat();
 
-        dados.tempoChegada(inicio);
+        encomenda.DefineEncomenda(prod, dados.getClienteIn(), loja, transportador, peso);
 
         int nota;
 
-        dados.duracaoViagem(destino);
+        Duration duracaoViagem = transportador.tempoViagem(encomenda);
+        encomenda.setTempo(duracaoViagem);
+        encomenda.setEfetuada(false);
 
-        dados.atualizaData();
-
-        dados.updateLocalViatCli(destino);
+        dados.setEnc(encomenda);
+        dados.geraReferenciaEncomenda(encomenda);
 
         System.out.println("Classificação a atribuir ao Transportador:");
-        nota=input.nextInt();
+        nota = input.nextInt();
 
         dados.daClassificacao(nota);
 
-        dados.add();
+        dados.addRegistoC();
 
-        dados.addRegistoV();
+        dados.addRegistoT();
 
-        dados.addRegistoP();
+        dados.addRegistoL();
 
-        dados.addTotalFaturado();
-
-        dados.addKmspercoridos();
-        // }
         input.close();
     }
 
-    public static void pedidos(){
+    public static void pedidosEmpresa() {
 
         Scanner input = new Scanner(System.in);
         int op;
-        if (dados.getplogado().getPedidos().size()>0){
+        if (dados.getEmpresaIn().getEncomendasPedidas().size() > 0) {
             System.out.println("Aceitar pedido?(1)->Aceitar (2)->Recusar");
-
-            op=input.nextInt();
-            if (op==1) dados.addAluguer();
-        }else System.out.println("Não tem pedidos");
+            op = input.nextInt();
+            if (op == 1) dados.addEncomendaEmpresa();
+        } else System.out.println("Não tem pedidos");
 
     }
-    public static void perfilCliente(){
 
-        do{
+    public static void pedidosVoluntario() {
+
+        Scanner input = new Scanner(System.in);
+        int op;
+        if (dados.getVoluntarioIn().getEncomendasPedidas().size() > 0) {
+            System.out.println("Aceitar pedido?(1)->Aceitar (2)->Recusar");
+
+            op = input.nextInt();
+            if (op == 1) dados.addEncomendaVoluntario();
+        } else System.out.println("Não tem pedidos");
+
+    }
+
+    public static void perfilCliente() {
+
+        do {
             cliente.executa();
 
 
-            switch(cliente.getOp()){
+            switch (cliente.getOp()) {
                 case 1:
                     showdadosC();
                     break;
                 case 2:
-                    showaluguer(1);
+                    showencguer(1);
                     break;
                 case 3:
-                    alugar();
+                    encomendar();
                     break;
                 default:
                     System.out.println("Opção inválida.");
             }
-        } while(cliente.getOp()!=0);
+        } while (cliente.getOp() != 0);
 
     }
-    public static void showaluguer(int x){
-        LocalDate data,data2;
-        String date,date2;
+
+    public static void showencguer(int x) {
+        LocalDate data, data2;
+        String date, date2;
         Scanner input = new Scanner(System.in);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
         System.out.println("Insira o intervalo de datas 1º:(d/mm/yyyy) ");
         date = input.nextLine();
-        data= LocalDate.parse(date, formatter);
+        data = LocalDate.parse(date, formatter);
         System.out.println("2º:(d/m/yyyy) ");
         date2 = input.nextLine();
-        data2=LocalDate.parse(date2, formatter);
-        dados.showAluguer(data,data2, x);
+        data2 = LocalDate.parse(date2, formatter);
+        dados.showEncomenda(data, data2, x);
         input.close();
     }
-    public static void perfilProp(){
+
+    public static void perfilEmpresa() {
 
 
-        do{
-            proprietario.executa();
+        do {
+            transportador.executa();
 
 
-            switch(proprietario.getOp()){
+            switch (transportador.getOp()) {
                 case 1:
-                    showdadosP();
+                    showdadosE();
                     break;
                 case 2:
-                    showaluguer(2);
+                    showencguer(2);
                     break;
                 case 3:
-                    inserirViatura();
-                    break;
-                case 4:
-                    ShowVeiculos();
-                    break;
-                case 5:
                     showPreco();
                     break;
-                case 6:
-                    pedidos();
+                case 4:
+                    pedidosEmpresa();
+                case 5:
+                    pedidosVoluntario();
                     break;
                 default:
                     System.out.println("Opção inválida.");
             }
-        } while(proprietario.getOp() != 0);
+        } while (transportador.getOp() != 0);
 
     }
-    public static void showPreco()
-    {
+
+    public static void showPreco() {
 
 
-
-
-
-        do{
+        do {
 
             showPreco.executa();
 
-            switch(showPreco.getOp()){
+            switch (showPreco.getOp()) {
                 case 1:
                     totalPeriodo();
                     break;
@@ -260,58 +299,67 @@ public class View implements Serializable
                 default:
                     System.out.println("Opção inválida.");
             }
-        } while(showPreco.getOp() != 0);
+        } while (showPreco.getOp() != 0);
 
 
     }
-    public static void totalPeriodo(){
-        String matricula;
+
+    public static void totalPeriodo() {
+        String email;
         Scanner entrada = new Scanner(System.in);
-        System.out.println("Insira a matricula: ");
-        matricula = entrada.nextLine();
-        System.out.println("Total faturado com o veiculo:"+dados.showTotalFaturado(matricula));
+        System.out.println("Insira o seu email ");
+        email = entrada.nextLine();
+        System.out.println("Total faturado pela empresa :" + dados.getEmpresaIn().getTotalFaturado());
         entrada.close();
     }
-    public static void totalFperiodo(){
 
-        String matricula;
+    public static void totalFperiodo() {
+
+        String email;
         LocalDate data;
         String date;
         Scanner entrada = new Scanner(System.in);
-        System.out.println("Insira a matricula: ");
-        matricula = entrada.nextLine();
+        System.out.println("Insira o email: ");
+        email = entrada.nextLine();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
         System.out.println("Insira a data:(d/mm/yyyy) ");
         date = entrada.nextLine();
-        data= LocalDate.parse(date, formatter);
-        System.out.println("Total faturado com o veiculo:"+dados.totalFaturadoPeriodo(matricula,data));
+        data = LocalDate.parse(date, formatter);
+        System.out.println("Total faturado nesse periodo:" + dados.totalFaturadoPeriodo(email, data));
         entrada.close();
 
     }
 
 
-    public static void showdadosC()
-    {
+    public static void showdadosC() {
 
-        System.out.println(dados.ShowDadosC().toString());
-
-    }
-    public static void showdadosP()
-    {
-
-        System.out.println(dados.ShowDadosP().toString());
+        System.out.println(dados.ShowDadosU().toString());
 
     }
-    public static void inclui()
-    {
-        String email,nome,password,morada,data;
-        int op,nif;
+
+    public static void showdadosE() {
+
+        System.out.println(dados.ShowDadosE().toString());
+
+    }
+
+    public static void showdadosV() {
+
+        System.out.println(dados.ShowDadosV().toString());
+
+    }
+
+    public static void inclui() {
+        String email, nome, password;
+        int op, nif;
+        double morada1, morada2;
 
         Scanner input = new Scanner(System.in);
         System.out.println("1. Sou Cliente");
-        System.out.println("2. Sou Transportador");
-        System.out.println("3. Sou Lojista");
-        op=input.nextInt();
+        System.out.println("2. Sou Transportador afiliado a uma empresa");
+        System.out.println("3. Sou Transportador voluntario");
+        System.out.println("4. Sou Lojista");
+        op = input.nextInt();
 
         input.nextLine();
 
@@ -325,15 +373,17 @@ public class View implements Serializable
         System.out.println("Insira a password: ");
         password = input.nextLine();
 
-        System.out.println("Insira a morada: ");
-        morada = input.nextLine();
+        System.out.println("Insira a coordenada x da sua morada ou localização atual:");
+        morada1 = input.nextDouble();
+        System.out.println("Insira a coordenada y da sua morada ou localização atual:");
+        morada2 = input.nextDouble();
 
+        Point2D.Double morada = new Point2D.Double(morada1, morada2);
 
         System.out.println("Insira o seu Nif");
         nif = input.nextInt();
 
-        if (op==1)
-        {
+        if (op == 1) {
             User c = new User();
 
             c.setEmail(email);
@@ -341,149 +391,114 @@ public class View implements Serializable
             c.setPassword(password);
             c.setMorada(morada);
             c.setNif(nif);
-            try{
-                dados.registarCliente(c);
+            try {
+                dados.registarUtilizador(c);
                 input.close();
                 System.out.println("Registado com sucesso");
-            }
-            catch(Exception e){
+            } catch (Exception e) {
                 System.out.println(e);
             }
         }
-        if (op==2)
-        {
-            Transporte p = new Tr();
+        if (op == 2) {
+            double taxa;
+
+            System.out.println("Insira a taxa de transporte que pretende");
+            taxa = input.nextDouble();
+
+            EmpresaTransportadora p = new EmpresaTransportadora();
 
             p.setEmail(email);
             p.setNome(nome);
             p.setPassword(password);
             p.setMorada(morada);
-            p.setDataN(data);
             p.setNif(nif);
-            try{
-                dados.registarProprietario(p);
+            p.setTaxa(taxa);
+            try {
+                dados.registarEmpresa(p);
                 input.close();
                 System.out.println("Registado com sucesso");
+            } catch (Exception e) {
+                System.out.println(e);
             }
-            catch(Exception e){
+
+        }
+        if (op == 3) {
+
+
+            Voluntario p = new Voluntario();
+
+            p.setEmail(email);
+            p.setNome(nome);
+            p.setPassword(password);
+            p.setMorada(morada);
+            p.setNif(nif);
+
+            try {
+                dados.registarVoluntario(p);
+                input.close();
+                System.out.println("Registado com sucesso");
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+
+        }
+        if (op == 4) {
+
+            Loja p = new Loja();
+
+            p.setEmail(email);
+            p.setNome(nome);
+            p.setPassword(password);
+            p.setMorada(morada);
+            p.setNif(nif);
+
+            try {
+                dados.RegistaLoja(p);
+                input.close();
+                System.out.println("Registado com sucesso");
+            } catch (Exception e) {
                 System.out.println(e);
             }
 
         }
 
-
-    }
-    public static void inserirViatura()
-    {
-        String matricula,marca,tipo;
-        int nif;
-        double velmedia,precobase,consumo,autonomia;
-
-        double x,y;
-        Scanner input = new Scanner(System.in);
-
-
-
-        System.out.println("Insira a matricula da sua viatura: ");
-        matricula = input.nextLine();
-
-        System.out.println("Insira a marca da sua viatura: ");
-        marca = input.nextLine();
-
-        System.out.println("Insira o tipo: ");
-        tipo = input.nextLine();
-
-        System.out.println("Insira o seu nif: ");
-        nif = input.nextInt();
-
-        System.out.println("Insira a velocidade media da viatura");
-        velmedia = input.nextDouble();
-        System.out.println("Insira o preço base da viatura");
-        precobase = input.nextDouble();
-        System.out.println("Insira a autonomia da viatura");
-        autonomia = input.nextDouble();
-        System.out.println("Insira o consumo da viatura");
-        consumo = input.nextDouble();
-        System.out.println("Insira a coordenada X onde se encontra a sua viatura");
-        x = input.nextDouble();
-        System.out.println("Insira a coordenada Y onde se encontra a sua viatura");
-        y = input.nextDouble();
-        if (tipo.equals("Gasolina")) {
-            CarroGasolina c = new CarroGasolina();
-            c.setMatricula(matricula);
-            c.setVel_Media(velmedia);
-            c.setConsumo(consumo);
-            c.setPrecoBase(precobase);
-            c.setNif(nif);
-            c.setAutonomia(autonomia);
-            c.setAutonomiaAtual(autonomia);
-            c.setTipo(tipo);
-            c.setMarca(marca);
-            c.setLocalizacao(x,y);
-            dados.Registaveiculo(c);
-        }
-        else if (tipo.equals("Electrico")) {
-            CarroGasolina c = new CarroGasolina();
-            c.setMatricula(matricula);
-            c.setVel_Media(velmedia);
-            c.setConsumo(consumo);
-            c.setPrecoBase(precobase);
-            c.setNif(nif);
-            c.setAutonomia(autonomia);
-            c.setAutonomiaAtual(autonomia);
-            c.setTipo(tipo);
-            c.setMarca(marca);
-            c.setLocalizacao(x,y);
-            dados.Registaveiculo(c);
-        }
-        else if(tipo.equals("Hibrido")){
-
-
-        }
-        else{
-            System.out.println("Esse tipo de veículo não está disponível!");
-        }
-        input.close();
     }
 
-    private static void iniciaSessaoAux(int op)
-    {
+
+    private static void iniciaSessaoAux(int op) {
         String mail, pass;
         Scanner in = new Scanner(System.in);
         System.out.println("Email: ");
-        mail=in.nextLine();
+        mail = in.nextLine();
         System.out.println("Password: ");
-        pass =in.nextLine();
-        if (op==1) {
-            try{
-                dados.iniciaSessaoC(mail,pass);
+        pass = in.nextLine();
+        if (op == 1) {
+            try {
+                dados.iniciaSessaoC(mail, pass);
                 System.out.println("Sessão iniciada com sucesso");
                 perfilCliente();
-            }
-            catch(Exception e){
+            } catch (Exception e) {
                 System.out.println(e);
             }
-        }
-        else{
-            try{
-                dados.iniciaSessaoP(mail,pass);
+        } else {
+            try {
+                dados.iniciaSessaoE(mail, pass);
                 System.out.println("Sessão iniciada com sucesso");
-                perfilProp();
-            }
-            catch(Exception e){
+                perfilEmpresa();
+            } catch (Exception e) {
                 System.out.println(e);
             }
         }
         in.close();
     }
-    private static void iniciaSessao()
-    {
+
+    private static void iniciaSessao() {
 
 
-        do{
+        do {
             escolhaC.executa();
 
-            switch(escolhaC.getOp()){
+            switch (escolhaC.getOp()) {
                 case 1:
                     iniciaSessaoAux(1);
                     break;
@@ -493,224 +508,224 @@ public class View implements Serializable
                 default:
                     System.out.println("Opção inválida.");
             }
-        }while(escolhaC.getOp()!=0);
+        } while (escolhaC.getOp() != 0);
     }
-    public static void ShowVeiculos()
-    {
-        List<Veiculo> veiculos=dados.VeiculosProp();
-        Iterator<Veiculo> it = veiculos.iterator();
-        while(it.hasNext()){
-            Veiculo l = it.next();
-            System.out.println(l.toString());
-        }
-    }
-    public static void lerDadosGravados()
-    {
-        try{
-            dados = UMCarroJa.lerDados();
-        }
-        catch(IOException e){
-            dados = new UMCarroJa();
-            System.out.println("Não conseguiu ler os dados!.");
-        }
-        catch(ClassNotFoundException e){
-            dados = new UMCarroJa();
-            System.out.println("Não conseguiu ler os dados!");
-        }
-        catch(ClassCastException e){
-            dados = new UMCarroJa();
-            System.out.println("Não conseguiu ler os dados!");
+
+    public static void lerDadosGravados() {
+        try {
+            dados = TrazAqui.lerDados();
+        } catch (IOException e) {
+            dados = new TrazAqui();
+            System.out.println("Não conseguiu ler os dados 1 !.");
+        } catch (ClassNotFoundException e) {
+            dados = new TrazAqui();
+            System.out.println("Não conseguiu ler os dados 2 !");
+        } catch (ClassCastException e) {
+            dados = new TrazAqui();
+            System.out.println("Não conseguiu ler os dados 3 !");
         }
     }
 
-    public static void carregaDados()
-    {
-        try{
-            BufferedReader br = new BufferedReader(new FileReader("logs.txt"));
-            while(br.ready()){
+    public static void carregaDados() {
+        try {
+
+            BufferedReader br = new BufferedReader(new FileReader("TrazAqui/logs.txt"));
+
+            while (br.ready()) {
                 String linha = br.readLine();
                 tratalinhas(linha);
             }
             br.close();
-        }catch(IOException ioe){
+        } catch (IOException ioe) {
             ioe.printStackTrace();
         }
 
     }
-    public static void showTop(){
 
-        List<Cliente>top=new ArrayList<>();
-        top=dados.top10Aluguers();
-        int i=1;
-        Iterator<Cliente> it=top.iterator();
-        while(it.hasNext()){
-            Cliente c=it.next();
-            System.out.println("Pos"+i+c.getNome()+""+c.getNif());
+    public static void showTop() {
+
+        List<User> top = new ArrayList<>();
+        top = dados.topUsers();
+        int i = 1;
+        Iterator<User> it = top.iterator();
+        while (it.hasNext()) {
+            User c = it.next();
+            System.out.println("Pos" + i + c.getNome() + "" + c.getNif());
             i++;
         }
 
 
     }
-    public static void showTopKm(){
 
-        List<Cliente>top=new ArrayList<>();
-        top=dados.top10Kms();
-        int i=1;
-        Iterator<Cliente> it=top.iterator();
-        while(it.hasNext()){
-            Cliente c=it.next();
-            System.out.println("Pos:"+" "+i+" "+c.getNome()+" "+c.getKmPercorridos());
+    public static void showTopKm() {
+
+        List<EmpresaTransportadora> top = new ArrayList<>();
+        top = dados.top10Kms();
+        int i = 1;
+        Iterator<EmpresaTransportadora> it = top.iterator();
+        while (it.hasNext()) {
+            EmpresaTransportadora c = it.next();
+            System.out.println("Pos:" + " " + i + " " + c.getNome() + " " + c.getNumeroKms());
             i++;
         }
     }
-    public static void tratalinhas(String linha)
-    {
-        Proprietario p = new Proprietario();
-        Aluguer alu=new Aluguer();
-        Cliente c=new Cliente();
-        StringTokenizer Tok = new StringTokenizer(linha,":,");
+
+    public static void tratalinhas(String linha) {
+
+        EmpresaTransportadora p = new EmpresaTransportadora();
+        Voluntario v = new Voluntario();
+        Encomenda enc = new Encomenda();
+        User u = new User();
+        Loja l = new Loja();
+        StringTokenizer Tok = new StringTokenizer(linha, ":,");
 
         List<String> tokens = new ArrayList<>();
         while (Tok.hasMoreElements()) {
             tokens.add(Tok.nextToken());
         }
 
-        CarroGasolina cg=new CarroGasolina();
-        CarroEletrico ce=new CarroEletrico();
-        if (tokens.get(0).equals("NovoCliente")){
 
-            Point2D.Double pcliente=new Point2D.Double();
-            c.setEmail(tokens.get(3));
-            c.setNome(tokens.get(1));
-            c.setPassword(tokens.get(3));
-            c.setMorada(tokens.get(4));
-            c.setDataN("12-11-1999");
-            c.setNif(Integer.parseInt(tokens.get(2)));
-            double x=Double.parseDouble(tokens.get(5));
-            double y=Double.parseDouble(tokens.get(6));
-            pcliente.setLocation(x,y);
-            c.setLocalizacao(pcliente);
-            try{
-                dados.registarCliente(c);
+        if (tokens.get(0).equals("Utilizador")) {
 
-                System.out.println("Registado com sucesso");
-            }
-            catch(Exception e){
-                System.out.println(e);
-            }
-        }
-        else if(tokens.get(0).equals("NovoProp")){
-            p.setEmail(tokens.get(3));
-            p.setNome(tokens.get(1));
-            p.setPassword(tokens.get(3));
-            p.setMorada(tokens.get(2));
-            p.setDataN("13-11-1985");
-            p.setNif(Integer.parseInt(tokens.get(2)));
-            try{
-                dados.registarProprietario(p);
+            Point2D.Double coordenadascliente = new Point2D.Double();
 
-                System.out.println("Registado com sucesso");
-            }
-            catch(Exception e){
-                System.out.println(e);
-            }
-
-        }else if (tokens.get(0).equals("NovoCarro")){
-
-
-            if (tokens.get(1).equals("Gasolina")) {
-
-                cg.setMatricula(tokens.get(3));
-                cg.setVel_Media(Double.parseDouble(tokens.get(5)));
-                cg.setConsumo(Double.parseDouble(tokens.get(7)));
-                cg.setPrecoBase(Double.parseDouble(tokens.get(6)));
-                cg.setNif(Integer.parseInt(tokens.get(4)));
-                cg.setAutonomia(Double.parseDouble(tokens.get(8)));
-                cg.setAutonomiaAtual(Double.parseDouble(tokens.get(8)));
-                cg.setTipo(tokens.get(1));
-                cg.setMarca(tokens.get(2));
-                cg.setLocalizacao(Double.parseDouble(tokens.get(9)),Double.parseDouble(tokens.get(10)));
-                dados.Registaveiculo(cg);
-            }
-            else if (tokens.get(1).equals("Electrico")) {
-
-                ce.setMatricula(tokens.get(3));
-                ce.setVel_Media(Double.parseDouble(tokens.get(5)));
-                ce.setConsumo(Double.parseDouble(tokens.get(7)));
-                ce.setPrecoBase(Double.parseDouble(tokens.get(6)));
-                ce.setNif(Integer.parseInt(tokens.get(4)));
-                ce.setAutonomia(Double.parseDouble(tokens.get(8)));
-                ce.setAutonomiaAtual(Double.parseDouble(tokens.get(8)));
-                ce.setTipo(tokens.get(1));
-                ce.setMarca(tokens.get(2));
-                ce.setLocalizacao(Double.parseDouble(tokens.get(9)),Double.parseDouble(tokens.get(10)));
-                dados.Registaveiculo(ce);
-            }
-            else if(tokens.get(1).equals("Hibrido")){
-
-
-            }
-            else{
-                System.out.println("Esse tipo de veículo não está disponível!");
-            }
-        }else if (tokens.get(0).equals("Aluguer")){
-            int result = Integer.parseInt(tokens.get(1));
-            alu.setC(dados.tiraCliente(result));
-            alu.setAceite(true);
-            Point2D.Double destino=new Point2D.Double();
-            double x=Double.parseDouble(tokens.get(2));
-            double y=Double.parseDouble(tokens.get(3));
-            dados.setAlu(alu);
-            String tipo=tokens.get(4);
-            String combustivel=tokens.get(5);
-            dados.defCliente(dados.tiraCliente(result));
-            destino.setLocation(x,y);
-            dados.definirCoor(dados.tiraCliente(result).getLocalizacao(),destino);
-            System.out.println("Iremos selecionar o veiculo que se encontra mais próximo de si");
-            if (tokens.get(5).equals("MaisBarato")) dados.veiMaisBarato(destino,tipo);
-            else dados.veiMaisProx(dados.tiraCliente(result).getLocalizacao(),destino,tipo);
-            if (dados.TemAutonomia()==true) System.out.println("O veiculo tem autonomia suficiente");
-
-            dados.tempoChegada(dados.tiraCliente(result).getLocalizacao());
-
-            dados.duracaoViagem(destino);
-
-            dados.atualizaData();
-
-            dados.addRegistoC();
-
-            dados.addRegistoV();
-
-            dados.addRegistoP();
-
-            dados.addTotalFaturado();
-
-            dados.addKmspercoridos();
-
-            dados.updateLocalViatCli(destino);
-
-
-        }else if  (tokens.get(0).equals("Classificar")){
-
-            int nota=Integer.parseInt(tokens.get(2));
+            u.setReferencia(tokens.get(1));
+            u.setNome(tokens.get(2));
+            double x = parseDouble(tokens.get(3));
+            double y = parseDouble(tokens.get(4));
+            coordenadascliente.setLocation(x, y);
+            u.setMorada(coordenadascliente);
 
             try {
-                int nif= Integer.parseInt(tokens.get(1));
-                dados.addClassCli(nif,nota);
+                dados.registarUtilizador(u);
 
-            } catch (NumberFormatException nfe) {
-                dados.addClassProp(tokens.get(1),nota);
+
+                System.out.println("Utilizador Registado com sucesso");
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        } else if (tokens.get(0).equals("Loja")) {
+
+            l.setReferencia(tokens.get(1));
+            l.setNome(tokens.get(2));
+            double x = Double.parseDouble(tokens.get(3));
+            double y = Double.parseDouble(tokens.get(4));
+            Point2D.Double coordenadas = new Point2D.Double();
+            coordenadas.setLocation(x, y);
+            l.setMorada(coordenadas);
+
+            // System.out.println(l);
+
+            try {
+                dados.RegistaLoja(l);
+                System.out.println("Loja Registada com sucesso");
+                //System.out.println(dados.getLojas());
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        } else if (tokens.get(0).equals("Transportadora")) {
+
+            p.setReferencia(tokens.get(1));
+            p.setNome(tokens.get(2));
+            double x = Double.parseDouble(tokens.get(3));
+            double y = Double.parseDouble(tokens.get(4));
+            p.setNif(Long.parseLong(tokens.get(5)));
+            Point2D.Double coordenadastransporte = new Point2D.Double();
+            coordenadastransporte.setLocation(x, y);
+            p.setMorada(coordenadastransporte);
+            p.setRaio(Float.parseFloat(tokens.get(6)));
+            p.setTaxa(Double.parseDouble(tokens.get(7)));
+
+
+            // System.out.println(p);
+
+            try {
+                dados.registarEmpresa(p);
+                System.out.println("Transportadora Registado com sucesso");
+                //System.out.println(dados.getEmpresaTransporte());
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        } else if (tokens.get(0).equals("Voluntario")) {
+            v.setReferencia(tokens.get(1));
+            v.setNome(tokens.get(2));
+            v.setRaio(parseFloat(tokens.get(5)));
+            double x = Double.parseDouble(tokens.get(3));
+            double y = Double.parseDouble(tokens.get(4));
+            Point2D.Double coordenadasvoluntario = new Point2D.Double();
+            coordenadasvoluntario.setLocation(x, y);
+            v.setMorada(coordenadasvoluntario);
+
+            try {
+                dados.registarVoluntario(v);
+
+                System.out.println("Voluntario Registado com sucesso");
+            } catch (Exception e) {
+                System.out.println(e);
             }
 
 
+        } else if (tokens.get(0).equals("Encomenda")) {
+            String result = tokens.get(1);
+            enc.setReferencia(tokens.get(1));
+            enc.setComprador(dados.getUsers().get(tokens.get(2)));
+            enc.setLoja(dados.getLojas().get(tokens.get(3)));
+            enc.setPeso(parseFloat(tokens.get(4)));
 
+
+            List<Produto> aux = new ArrayList<>();
+            int i = 5;
+            while (i < tokens.size()) {
+                Produto x = new Produto();
+                x.setReferencia(tokens.get(i++));
+                x.setNome(tokens.get(i++));
+                x.setQuantidade(Float.parseFloat(tokens.get(i++)));
+                x.setPreco(Double.parseDouble(tokens.get(i++)));
+                aux.add(x);
+            }
+            System.out.println(aux);
+
+            enc.setProdutos(aux);
+
+            dados.adicionaEncomenda(enc);
+
+
+            //atualizar encomendas nos users
+            User e = dados.getUsers().get(tokens.get(2));
+            e.adicionaEncomendaUser(enc);
+            dados.adicionaUser(e);
+
+
+            //atualizar encomenda nas loja
+            Loja j = dados.getLojas().get(tokens.get(3));
+            j.adicionaEncomendaLoja(enc);
+            dados.adicionaLoja(j);
+
+
+            System.out.println("produtos adicionados");
+
+
+        } else if (tokens.get(0).equals("Aceite")) {
+
+            Encomenda e = dados.getEncomendas().get(tokens.get(1));
+            e.setEfetuada(true);
+            dados.adicionaEncomenda(e);
+            System.out.println("Encomendas efetuadas lidas");
+
+            try {
+            } catch (NumberFormatException nfe) {
+
+            }
 
 
         }
+
     }
 
-
 }
+
+
+
 
 
 

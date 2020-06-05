@@ -108,13 +108,15 @@ public abstract class Ator implements Serializable
 
     public abstract Ator clone();
 
-    public String toString ()
-    {
-        StringBuilder sb = new StringBuilder ();
-        sb.append("Email: ").append(this.email).append("\nNome: ").append(this.nome)
-                .append("\nMorada: ").append(this.morada)
-                .append("\nNIF: ").append(this.nif);
-        return sb.toString();
+    @Override
+    public String toString() {
+        return
+                "email='" + email + '\'' +
+                ", referencia='" + referencia + '\'' +
+                ", nome='" + nome + '\'' +
+                ", password='" + password + '\'' +
+                ", morada=" + morada
+                ;
     }
 
 
