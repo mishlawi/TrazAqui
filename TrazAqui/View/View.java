@@ -3,9 +3,11 @@ package View;
 import Model.*;
 import jdk.swing.interop.SwingInterOpUtils;
 
+import javax.print.DocFlavor;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.IllegalCharsetNameException;
 import java.time.Duration;
 import java.util.*;
 import java.awt.geom.Point2D;
@@ -33,19 +35,20 @@ public class View implements Serializable {
                 "Top 10 Empresas Transportadoras com mais kms"};
 
         String[] menuCliente = {"Dados pessoais",
+                "Requesitar entrega",
                 "Listagem de encomendas",
-                ""};
+                "Minhas encomendas",
+                };
 
         String[] menuTransportador = {"Dados pessoais",
-                "Listagem de encomendas",
                 "Minhas Encomendas",
-                "Mostrar total faturado num veiculo",
+                "Mostrar total faturado",
                 "Pedidos"};
 
-        String[] menuLoja = {"Dados da sua empresa",
+        String[] menuLoja = {"Dados da sua loja",
                 "Listagem de encomendas",
-                "Minhas Encomendas",
-                "Mostrar total faturado num veiculo",
+                "Meus Produtos",
+                "Adicionar Produto",
                 "Pedidos"};
 
 
@@ -53,7 +56,7 @@ public class View implements Serializable {
                 "Total faturado ",
                 "Total faturado num periodo"};
 
-        String[] mescolhaC = {"Sou cliente", "Sou proprietario"};
+        String[] mescolhaC = {"Sou cliente", "Sou transportador de encomendas", "Sou voluntario", "Sou lojista"};
 
         principal = new Menu(menuPrincipal);
         cliente = new Menu(menuCliente);
@@ -67,7 +70,6 @@ public class View implements Serializable {
 
 
         carregaDados();
-        dados.gravar();
         carregaMenus();
         lerDadosGravados();
 
@@ -82,7 +84,7 @@ public class View implements Serializable {
 
             switch (principal.getOp()) {
                 case 1:
-                    inclui();
+                    registar();
                     break;
                 case 2:
                     iniciaSessao();
@@ -104,11 +106,11 @@ public class View implements Serializable {
 
         Encomenda encomenda = new Encomenda();
 
-        Scanner input = new Scanner(System.in);
+
 
         String x;
         System.out.println("1. Indique a referencia da loja");
-        x = input.next();
+        x = Input.lerString();
         Loja loja = dados.getLojas().get(x);
 
 
@@ -116,7 +118,7 @@ public class View implements Serializable {
         List<Produto> prod = new ArrayList<>();
 
         System.out.println("Número de produtos que vai comprar");
-        produtos = input.nextInt();
+        produtos = Input.lerInt();
         int i = 0;
 
         while (i < produtos) {
@@ -128,15 +130,15 @@ public class View implements Serializable {
             System.out.println("");
 
             System.out.println("Nome do produto");
-            nome = input.nextLine();
+            nome = Input.lerString();
             System.out.println("Quantidade:");
-            quantidade = input.nextInt();
+            quantidade = Input.lerInt();
             System.out.println("Preco do produto:");
-            preco = input.nextDouble();
+            preco = Input.lerDouble();
             System.out.println("Produto Medicinal? (S/N)");
-            med = input.nextLine();
+            med = Input.lerString();
             //if (med.equals("S")) p = new Produto(nome,quantidade,preco,true);
-            // if (med.equals("N")) p = new Produto(nome,quantidade,preco,false);
+            //if (med.equals("N")) p = new Produto(nome,quantidade,preco,false);
             //else break;
             prod.add(p);
             i++;
@@ -153,7 +155,7 @@ public class View implements Serializable {
         System.out.println("2:Escolher Voluntario");
         System.out.println("3:Escolher Empresa mais barata");
         System.out.println("Opçao:");
-        opcao = input.nextInt();
+        opcao = Input.lerInt();
         Transporte transportador = new Transporte();
         if (opcao == 1)
             transportador = dados.sortEncomendaTransporte(encomenda); //transportador mais proximo
@@ -162,7 +164,7 @@ public class View implements Serializable {
 
         float peso;
         System.out.println("Indique o peso aproximado da sua encomenda");
-        peso = input.nextFloat();
+        peso = Input.lerFloat();
 
         encomenda.DefineEncomenda(prod, dados.getClienteIn(), loja, transportador, peso);
 
@@ -176,7 +178,7 @@ public class View implements Serializable {
         dados.geraReferenciaEncomenda(encomenda);
 
         System.out.println("Classificação a atribuir ao Transportador:");
-        nota = input.nextInt();
+        nota = Input.lerInt();
 
         dados.daClassificacao(nota);
 
@@ -186,16 +188,15 @@ public class View implements Serializable {
 
         dados.addRegistoL();
 
-        input.close();
     }
 
     public static void pedidosEmpresa() {
 
-        Scanner input = new Scanner(System.in);
+
         int op;
         if (dados.getEmpresaIn().getEncomendasPedidas().size() > 0) {
             System.out.println("Aceitar pedido?(1)->Aceitar (2)->Recusar");
-            op = input.nextInt();
+            op = Input.lerInt();
             if (op == 1) dados.addEncomendaEmpresa();
         } else System.out.println("Não tem pedidos");
 
@@ -203,14 +204,31 @@ public class View implements Serializable {
 
     public static void pedidosVoluntario() {
 
-        Scanner input = new Scanner(System.in);
+
         int op;
         if (dados.getVoluntarioIn().getEncomendasPedidas().size() > 0) {
             System.out.println("Aceitar pedido?(1)->Aceitar (2)->Recusar");
 
-            op = input.nextInt();
+            op = Input.lerInt();
             if (op == 1) dados.addEncomendaVoluntario();
         } else System.out.println("Não tem pedidos");
+
+    }
+
+
+
+    public static void showencguer(int x) {
+        LocalDate data, data2;
+        String date, date2;
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
+        System.out.println("Insira o intervalo de datas 1º:(d/mm/yyyy) ");
+        date = Input.lerString();
+        data = LocalDate.parse(date, formatter);
+        System.out.println("2º:(d/m/yyyy) ");
+        date2 = Input.lerString();
+        data2 = LocalDate.parse(date2, formatter);
+        dados.showEncomenda(data, data2, x);
 
     }
 
@@ -236,22 +254,6 @@ public class View implements Serializable {
         } while (cliente.getOp() != 0);
 
     }
-
-    public static void showencguer(int x) {
-        LocalDate data, data2;
-        String date, date2;
-        Scanner input = new Scanner(System.in);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
-        System.out.println("Insira o intervalo de datas 1º:(d/mm/yyyy) ");
-        date = input.nextLine();
-        data = LocalDate.parse(date, formatter);
-        System.out.println("2º:(d/m/yyyy) ");
-        date2 = input.nextLine();
-        data2 = LocalDate.parse(date2, formatter);
-        dados.showEncomenda(data, data2, x);
-        input.close();
-    }
-
     public static void perfilEmpresa() {
 
 
@@ -281,6 +283,35 @@ public class View implements Serializable {
 
     }
 
+    public static void perfilLoja() {
+
+
+        do {
+            loja.executa();
+
+
+            switch (loja.getOp()) {
+                case 1:
+                    showdadosV();
+                    break;
+                case 2:
+                    showencguer(2);
+                    break;
+                case 3:
+                    showPreco();
+                    break;
+                case 4:
+                    pedidosEmpresa();
+                case 5:
+                    pedidosVoluntario();
+                    break;
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        } while (transportador.getOp() != 0);
+
+    }
+
     public static void showPreco() {
 
 
@@ -290,7 +321,7 @@ public class View implements Serializable {
 
             switch (showPreco.getOp()) {
                 case 1:
-                    totalPeriodo();
+                    totalFaturadoEmpresa();
                     break;
                 case 2:
                     totalFperiodo();
@@ -304,13 +335,16 @@ public class View implements Serializable {
 
     }
 
-    public static void totalPeriodo() {
-        String email;
-        Scanner entrada = new Scanner(System.in);
-        System.out.println("Insira o seu email ");
-        email = entrada.nextLine();
+    public static void totalFaturadoEmpresa() {
+        /*
+        String referencia;
+
+        System.out.println("Insira a sua referencia ");
+        referencia = Input.lerString();
+
+         */
         System.out.println("Total faturado pela empresa :" + dados.getEmpresaIn().getTotalFaturado());
-        entrada.close();
+
     }
 
     public static void totalFperiodo() {
@@ -318,15 +352,15 @@ public class View implements Serializable {
         String email;
         LocalDate data;
         String date;
-        Scanner entrada = new Scanner(System.in);
-        System.out.println("Insira o email: ");
-        email = entrada.nextLine();
+
+        System.out.println("Insira a referencia : ");
+        email = Input.lerString();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
         System.out.println("Insira a data:(d/mm/yyyy) ");
-        date = entrada.nextLine();
+        date = Input.lerString();
         data = LocalDate.parse(date, formatter);
         System.out.println("Total faturado nesse periodo:" + dados.totalFaturadoPeriodo(email, data));
-        entrada.close();
+
 
     }
 
@@ -349,148 +383,179 @@ public class View implements Serializable {
 
     }
 
-    public static void inclui() {
+    public static void showdadosL() {
+
+        System.out.println(dados.ShowDadosL().toString());
+
+    }
+
+    public static void registar() {
         String email, nome, password;
         int op, nif;
         double morada1, morada2;
 
-        Scanner input = new Scanner(System.in);
+
         System.out.println("1. Sou Cliente");
         System.out.println("2. Sou Transportador afiliado a uma empresa");
         System.out.println("3. Sou Transportador voluntario");
         System.out.println("4. Sou Lojista");
-        op = input.nextInt();
-
-        input.nextLine();
-
-
-        System.out.println("Insira o seu email: ");
-        email = input.nextLine();
-
-        System.out.println("Insira o seu nome: ");
-        nome = input.nextLine();
-
-        System.out.println("Insira a password: ");
-        password = input.nextLine();
-
-        System.out.println("Insira a coordenada x da sua morada ou localização atual:");
-        morada1 = input.nextDouble();
-        System.out.println("Insira a coordenada y da sua morada ou localização atual:");
-        morada2 = input.nextDouble();
-
-        Point2D.Double morada = new Point2D.Double(morada1, morada2);
-
-        System.out.println("Insira o seu Nif");
-        nif = input.nextInt();
-
-        if (op == 1) {
-            User c = new User();
-
-            c.setEmail(email);
-            c.setNome(nome);
-            c.setPassword(password);
-            c.setMorada(morada);
-            c.setNif(nif);
-            try {
-                dados.registarUtilizador(c);
-                input.close();
-                System.out.println("Registado com sucesso");
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-        }
-        if (op == 2) {
-            double taxa;
-
-            System.out.println("Insira a taxa de transporte que pretende");
-            taxa = input.nextDouble();
-
-            EmpresaTransportadora p = new EmpresaTransportadora();
-
-            p.setEmail(email);
-            p.setNome(nome);
-            p.setPassword(password);
-            p.setMorada(morada);
-            p.setNif(nif);
-            p.setTaxa(taxa);
-            try {
-                dados.registarEmpresa(p);
-                input.close();
-                System.out.println("Registado com sucesso");
-            } catch (Exception e) {
-                System.out.println(e);
-            }
+        op = Input.lerInt();
+        if(op>4){ System.out.println("Opção invalida");
 
         }
-        if (op == 3) {
+        else {
 
 
-            Voluntario p = new Voluntario();
+            System.out.println("Insira o seu email: ");
+            email = Input.lerString();
 
-            p.setEmail(email);
-            p.setNome(nome);
-            p.setPassword(password);
-            p.setMorada(morada);
-            p.setNif(nif);
+            System.out.println("Insira o seu nome: ");
+            nome = Input.lerString();
 
-            try {
-                dados.registarVoluntario(p);
-                input.close();
-                System.out.println("Registado com sucesso");
-            } catch (Exception e) {
-                System.out.println(e);
+            System.out.println("Insira a password: ");
+            password = Input.lerString();
+
+            System.out.println("Insira a coordenada x da sua morada ou localização atual:");
+            morada1 = Input.lerDouble();
+            System.out.println("Insira a coordenada y da sua morada ou localização atual:");
+            morada2 = Input.lerDouble();
+
+            Point2D.Double morada = new Point2D.Double(morada1, morada2);
+
+            System.out.println("Insira o seu Nif");
+            nif = Input.lerInt();
+
+            if (op == 1) {
+                User c = new User();
+
+                c.setEmail(email);
+                c.setNome(nome);
+                c.setPassword(password);
+                c.setMorada(morada);
+                c.setNif(nif);
+                c = dados.geraReferenciaUser(c);
+                System.out.println("A sua referencia de cliente é: " + c.getReferencia());
+                try {
+                    dados.registarUtilizador(c);
+                    System.out.println("Registado com sucesso");
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
             }
+            if (op == 2) {
+                double taxa;
 
-        }
-        if (op == 4) {
+                System.out.println("Insira a taxa de transporte que pretende");
+                taxa = Input.lerDouble();
 
-            Loja p = new Loja();
+                EmpresaTransportadora p = new EmpresaTransportadora();
 
-            p.setEmail(email);
-            p.setNome(nome);
-            p.setPassword(password);
-            p.setMorada(morada);
-            p.setNif(nif);
+                p.setEmail(email);
+                p.setNome(nome);
+                p.setPassword(password);
+                p.setMorada(morada);
+                p.setNif(nif);
+                p.setTaxa(taxa);
+                p = dados.geraReferenciaTransportadorEmpresa(p);
+                System.out.println("A sua referencia de transportador é: " + p.getReferencia());
+                try {
+                    dados.registarEmpresa(p);
 
-            try {
-                dados.RegistaLoja(p);
-                input.close();
-                System.out.println("Registado com sucesso");
-            } catch (Exception e) {
-                System.out.println(e);
+                    System.out.println("Empresa transportadora Registada com sucesso");
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+
             }
+            if (op == 3) {
 
+
+                Voluntario p = new Voluntario();
+
+                p.setEmail(email);
+                p.setNome(nome);
+                p.setPassword(password);
+                p.setMorada(morada);
+                p.setNif(nif);
+                p = dados.geraReferenciaTransportadorVoluntario(p);
+                System.out.println("A sua referencia de voluntario é: " + p.getReferencia());
+
+                try {
+                    dados.registarVoluntario(p);
+                    System.out.println("Voluntario Registado com sucesso");
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            }
+            if (op == 4) {
+
+                Loja p = new Loja();
+
+                p.setEmail(email);
+                p.setNome(nome);
+                p.setPassword(password);
+                p.setMorada(morada);
+                p.setNif(nif);
+
+                try {
+                    dados.RegistaLoja(p);
+
+                    System.out.println("Registado com sucesso");
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+
+            }
         }
+
 
     }
 
-
     private static void iniciaSessaoAux(int op) {
-        String mail, pass;
-        Scanner in = new Scanner(System.in);
-        System.out.println("Email: ");
-        mail = in.nextLine();
+        String referencia, pass;
+
+        System.out.println("Rerencia: ");
+        referencia = Input.lerString();
         System.out.println("Password: ");
-        pass = in.nextLine();
+        pass = Input.lerString();
         if (op == 1) {
             try {
-                dados.iniciaSessaoC(mail, pass);
+                dados.iniciaSessaoC(referencia, pass);
                 System.out.println("Sessão iniciada com sucesso");
                 perfilCliente();
             } catch (Exception e) {
                 System.out.println(e);
             }
-        } else {
+        }
+        if (op == 2) {
             try {
-                dados.iniciaSessaoE(mail, pass);
+                dados.iniciaSessaoE(referencia, pass);
                 System.out.println("Sessão iniciada com sucesso");
                 perfilEmpresa();
             } catch (Exception e) {
                 System.out.println(e);
             }
         }
-        in.close();
+        if (op == 3) {
+            try {
+                dados.iniciaSessaoV(referencia, pass);
+                System.out.println("Sessão iniciada com sucesso");
+                perfilEmpresa();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+        if (op == 4) {
+            try {
+                dados.iniciaSessaoL(referencia, pass);
+                System.out.println("Sessão iniciada com sucesso");
+                perfilLoja();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
     }
+
 
     private static void iniciaSessao() {
 
@@ -505,46 +570,19 @@ public class View implements Serializable {
                 case 2:
                     iniciaSessaoAux(2);
                     break;
+                case 3:
+                    iniciaSessaoAux(3);
+                case 4:
+                    iniciaSessaoAux(4);
                 default:
                     System.out.println("Opção inválida.");
             }
         } while (escolhaC.getOp() != 0);
     }
 
-    public static void lerDadosGravados() {
-        try {
-            dados = TrazAqui.lerDados();
-        } catch (IOException e) {
-            dados = new TrazAqui();
-            System.out.println("Não conseguiu ler os dados 1 !.");
-        } catch (ClassNotFoundException e) {
-            dados = new TrazAqui();
-            System.out.println("Não conseguiu ler os dados 2 !");
-        } catch (ClassCastException e) {
-            dados = new TrazAqui();
-            System.out.println("Não conseguiu ler os dados 3 !");
-        }
-    }
-
-    public static void carregaDados() {
-        try {
-
-            BufferedReader br = new BufferedReader(new FileReader("TrazAqui/logs.txt"));
-
-            while (br.ready()) {
-                String linha = br.readLine();
-                tratalinhas(linha);
-            }
-            br.close();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
-
-    }
-
     public static void showTop() {
 
-        List<User> top = new ArrayList<>();
+        List<User> top;
         top = dados.topUsers();
         int i = 1;
         Iterator<User> it = top.iterator();
@@ -569,6 +607,43 @@ public class View implements Serializable {
             i++;
         }
     }
+
+
+    public static void lerDadosGravados() {
+        try {
+            dados = TrazAqui.lerDados();
+        } catch (IOException e) {
+            dados = new TrazAqui();
+            System.out.println("Não conseguiu ler os dados 1 !.");
+        } catch (ClassNotFoundException e) {
+            dados = new TrazAqui();
+            System.out.println("Não conseguiu ler os dados 2 !");
+        } catch (ClassCastException e) {
+            dados = new TrazAqui();
+            System.out.println("Não conseguiu ler os dados 3 !");
+        }
+    }
+
+
+
+    public static void carregaDados() {
+        try {
+
+            BufferedReader br = new BufferedReader(new FileReader("TrazAqui/logs.txt"));
+
+            while (br.ready()) {
+                String linha = br.readLine();
+                tratalinhas(linha);
+            }
+            br.close();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+
+    }
+
+
+
 
     public static void tratalinhas(String linha) {
 
@@ -683,7 +758,7 @@ public class View implements Serializable {
                 x.setPreco(Double.parseDouble(tokens.get(i++)));
                 aux.add(x);
             }
-            System.out.println(aux);
+            //System.out.println(aux);
 
             enc.setProdutos(aux);
 

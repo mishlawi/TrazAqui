@@ -24,16 +24,18 @@ public class Loja extends Ator implements Serializable {
         this.fila = 0;
         this.espera = 0;
         this.encomendas = new HashMap<>();
+        this.produtos = new ArrayList<>();
 
     }
 
 
-    public Loja(String nome,String referencia, Point2D.Double moradaLoja, int fila, float espera, Map<String,Encomenda> enc) {
+    public Loja(String nome,String referencia, Point2D.Double moradaLoja, int fila, float espera, Map<String,Encomenda> enc, List <Produto> prods) {
 
         this.referencia =  referencia;
         this.fila = fila;
         this.espera = espera;
         this.encomendas = enc;
+        this.produtos = prods;
 
     }
 
@@ -43,6 +45,7 @@ public class Loja extends Ator implements Serializable {
     setFila(a.getFila());
     setEspera(a.getEspera());
     this.encomendas = a.getEncomendas();
+    this.produtos = a.getProdutos();
 
     }
 
@@ -88,6 +91,13 @@ public class Loja extends Ator implements Serializable {
                 e.getValue().clone()));
     }
 
+    public List<Produto> getProdutos(){
+        ArrayList<Produto> lst = new ArrayList<>();
+        for(Produto p: this.produtos)
+            lst.add(p.clone());
+        return lst;
+    }
+
     @Override
     public String toString() {
         return super.toString()  +
@@ -98,6 +108,12 @@ public class Loja extends Ator implements Serializable {
                 ;
     }
 
+    public void setProdutos(List<Produto> prod){
+        this.produtos = new ArrayList<>();
+
+        for(Produto p: prod)
+            this.produtos.add(p.clone());
+    }
 
     /*Metodos*/
 

@@ -67,7 +67,7 @@ private Map<String,Encomenda> encomendas;
      */
     @Override
     public String toString() {
-        return "User{" +
+        return super.toString()+
                 "encomendas=" + encomendas +
                 '}';
     }

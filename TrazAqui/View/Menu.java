@@ -1,5 +1,7 @@
 package View;
 
+import Model.Input;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -48,14 +50,16 @@ public class Menu implements Serializable
     {
         int op;
 
-        Scanner in = new Scanner(System.in);
-        System.out.println("Opcao:");
-        op = in.nextInt();
-        if (op<0||op>this.opcoes.size()) {System.out.println("Opção Inválida!");
 
+        System.out.println("Opcao:");
+        op = Input.lerInt();
+        if (op<0||op>this.opcoes.size()) {
+            System.out.println("Opção Inválida!");
             op=-1;
         }
+
         return op;
+
     }
 
 }

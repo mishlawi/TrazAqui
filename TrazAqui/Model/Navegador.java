@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
+
     public class Navegador implements Serializable {
 
         int current_page;
@@ -94,5 +94,3 @@ import java.util.List;
             }
         }
     }
-}
-*/

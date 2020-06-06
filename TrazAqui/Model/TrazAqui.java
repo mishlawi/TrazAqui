@@ -321,9 +321,9 @@ public class TrazAqui implements Serializable{
 
 
     //inicio de sessao de cliente
-    public void iniciaSessaoC(String email, String password) throws LoginErradoException
+    public void iniciaSessaoC(String referencia, String password) throws LoginErradoException
     {
-        User u = users.get(email);
+        User u = users.get(referencia);
         if (u==null) throw new LoginErradoException("Email não registado");
         if(u.getPassword().equals(password)) this.userIn = u;
         else  throw new LoginErradoException("Password errada");
@@ -568,6 +568,47 @@ public class TrazAqui implements Serializable{
         a.setReferencia((sb.append("e" + sizeMap).toString()));
     }
 
+    public User geraReferenciaUser(User e){
+        StringBuilder sb = new StringBuilder();
+        int sizeMap = this.getUsers().size();
+
+        while(this.getEncomendas().containsKey((sb.append("u"+ sizeMap)).toString()))
+            sizeMap++;
+        e.setReferencia((sb.toString()));
+        return e;
+    }
+
+    public User geraReferenciaLoja(User e){
+        StringBuilder sb = new StringBuilder();
+        int sizeMap = this.getLojas().size();
+
+        while(this.getEncomendas().containsKey((sb.append("l"+ sizeMap)).toString()))
+            sizeMap++;
+        e.setReferencia((sb.toString()));
+        return e;
+    }
+
+    public EmpresaTransportadora geraReferenciaTransportadorEmpresa(EmpresaTransportadora e){
+        StringBuilder sb = new StringBuilder();
+        int sizeMap = this.getEmpresaTransporte().size();
+
+        while(this.getEncomendas().containsKey((sb.append("t"+ sizeMap)).toString()))
+            sizeMap++;
+        e.setReferencia((sb.toString()));
+        return e;
+    }
+    public Voluntario geraReferenciaTransportadorVoluntario (Voluntario e){
+        StringBuilder sb = new StringBuilder();
+        int sizeMap = this.getVoluntariosTransporte().size();
+
+        while(this.getEncomendas().containsKey((sb.append("v"+ sizeMap)).toString()))
+            sizeMap++;
+        e.setReferencia((sb.toString()));
+        return e;
+    }
+
+
+
     //basicamente trata da encomenda
     public void addEncomendaEmpresa(){
 
@@ -605,18 +646,18 @@ public class TrazAqui implements Serializable{
     public void addRegistoC ()
     {
 
-        String email=this.encomenda.getComprador().getEmail();
-        this.users.get(email).adicionaEncomendaUser(this.encomenda);
+        String referencia=this.encomenda.getComprador().getReferencia();
+        this.users.get(referencia).adicionaEncomendaUser(this.encomenda);
     }
     public void addRegistoT ()
     {
-        String email=this.encomenda.getDistribuidor().getEmail();
-        this.transporte.get(email).adicionaEncomendaTransporte(this.encomenda);
+        String referencia=this.encomenda.getDistribuidor().getReferencia();
+        this.transporte.get(referencia).adicionaEncomendaTransporte(this.encomenda);
     }
     public void addRegistoL ()
     {
-        String email=this.encomenda.getLoja().getEmail();
-        this.lojas.get(email).adicionaEncomendaLoja(this.encomenda);
+        String referencia=this.encomenda.getLoja().getReferencia();
+        this.lojas.get(referencia).adicionaEncomendaLoja(this.encomenda);
     }
 
     public User ShowDadosU()
@@ -633,11 +674,16 @@ public class TrazAqui implements Serializable{
         return this.voluntarioIn.clone();
     }
 
+    public Loja ShowDadosL()
+    {
+        return this.lojaIn.clone();
+    }
+
     /**
 Carregamento de dados
  **/
     public static TrazAqui lerDados() throws IOException, ClassNotFoundException{
-        System.out.println("Working Directory = " + System.getProperty("user.dir"));
+        //System.out.println("Working Directory = " + System.getProperty("user.dir"));
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream("TrazAqui.data"));
         TrazAqui db = (TrazAqui) ois.readObject();
         ois.close();

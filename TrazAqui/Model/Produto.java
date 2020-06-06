@@ -13,7 +13,7 @@ public class Produto implements Serializable {
 
     public Produto(){
         this.referencia = "";
-        this.nome= new String();
+        this.nome= "";
         this.quantidade= 0;
         this.preco = 0;
         this.medicinal = false;
