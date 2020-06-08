@@ -7,10 +7,10 @@ public class Produto implements Serializable {
 
     private String referencia;
     private String nome;
-    private float quantidade;
+    private double quantidade;
     private double preco;
     private boolean medicinal;
-    private float peso;
+    private double peso;
 
     public Produto(){
         this.referencia = "";
@@ -22,7 +22,7 @@ public class Produto implements Serializable {
     }
 
 
-    public Produto(String referencia, String nome, float quantidade, double preco ,boolean medicinal, float peso) {
+    public Produto(String referencia, String nome, double quantidade, double preco ,boolean medicinal, double peso) {
         this.referencia = referencia;
         this.nome = nome;
         this.quantidade = quantidade;
@@ -57,12 +57,11 @@ public class Produto implements Serializable {
         this.nome = nome;
     }
 
-    public float getQuantidade() {
+    public double getQuantidade() {
         return quantidade;
     }
 
-
-    public void setQuantidade(float quantidade) {
+    public void setQuantidade(double quantidade) {
         this.quantidade = quantidade;
     }
 
@@ -86,11 +85,11 @@ public class Produto implements Serializable {
         this.referencia = referencia;
     }
 
-    public float getPeso() {
+    public double getPeso() {
         return peso;
     }
 
-    public void setPeso(float peso) {
+    public void setPeso(double peso) {
         this.peso = peso;
     }
 
@@ -105,7 +104,7 @@ public class Produto implements Serializable {
 
     public String navString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(this.getReferencia() + " " + this.getNome());
+        sb.append(this.getReferencia() + " " + this.getNome() + " " + this.getPreco());
         return sb.toString();
     }
 

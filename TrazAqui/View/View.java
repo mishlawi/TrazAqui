@@ -72,11 +72,11 @@ public class View implements Serializable {
       /*  System.out.println("1-Ler ficheiro de logs?\n2-Prosseguir");
         int a = Input.lerInt();
         if (a == 1) {*/
-        carregaDados();
+
+    //  carregaDados();
+      //  dados.gravar();
         carregaMenus();
         lerDadosGravados();
-
-
         do {
 
             principal.executa();
@@ -119,25 +119,33 @@ public class View implements Serializable {
         System.out.println("1. Indique a referencia da loja");
         x = Input.lerString();
         Loja loja = dados.getLojas().get(x);
+        System.out.println(loja);
 
 
         int produtos;
-        System.out.println("1. Indique o numero de produtos que pretende comprar");
-        produtos = Input.lerInt();
+        List<String> b = dados.getLojas().get(x).getProdutos().values().stream().map(Produto::navString).collect(Collectors.toList());
+        System.out.println(b);
+        System.out.println("aaa");
+
+        Navegador n2 = new Navegador(b,1,10);
+        n2.run();
+
 
         int i = 0;
         List<Produto> prod = new ArrayList<>();
+
+        System.out.println("1. Indique o numero de produtos que pretende comprar");
+        produtos = Input.lerInt();
         while (i < produtos) {
-            List<String> b = dados.getProdutos().values().stream().map(Produto::navString).collect(Collectors.toList());
+            int j=i++;
 
-            Navegador n2 = new Navegador(b,1,15);
-            n2.run();
-
-            Produto p = new Produto();
+            Produto p;
             int quantidade;
+            System.out.println("_______________________________");
+            System.out.println("Produto " + j);
             System.out.println("Indique a referencia do produto");
             String nome = Input.lerString();
-            p = dados.getProdutos().get(nome);
+            p = dados.getLojas().get(x).getProdutos().get(nome);
             System.out.println("Quantidade:");
             quantidade = Input.lerInt();
             p.setQuantidade(quantidade);
@@ -146,6 +154,11 @@ public class View implements Serializable {
         }
 
         encomenda.setCusto(); //calcula o custo da encomenda
+        System.out.println("Custo total" + encomenda.getCusto());
+        encomenda.setLoja(dados.getLojas().get(x));
+        encomenda.setComprador(dados.getClienteIn());
+        encomenda.setPesoEncomenda();
+        System.out.println("Peso total " + encomenda.getPeso());
 
         System.out.println("Produtos adicionados com sucesso");
 
@@ -661,7 +674,7 @@ public class View implements Serializable {
 
     public static void showTopKm() {
 
-        List<EmpresaTransportadora> top = new ArrayList<>();
+        List<EmpresaTransportadora> top;
         top = dados.top10Kms();
         int i = 1;
         Iterator<EmpresaTransportadora> it = top.iterator();
@@ -792,7 +805,7 @@ public class View implements Serializable {
             double x = Double.parseDouble(tokens.get(3));
             double y = Double.parseDouble(tokens.get(4));
             Point2D.Double coordenadasvoluntario = new Point2D.Double();
-            coordenadasvoluntario.setLocation(x, y);
+            coordenadasvoluntario.setLocation(x,y);
             v.setMorada(coordenadasvoluntario);
 
             try {
@@ -818,13 +831,16 @@ public class View implements Serializable {
                 Produto x = new Produto();
                 x.setReferencia(tokens.get(i++));
                 x.setNome(tokens.get(i++));
-                x.setQuantidade(Float.parseFloat(tokens.get(i++)));
                 x.setPreco(Double.parseDouble(tokens.get(i++)));
-                aux.add(x);
-            }
-            //System.out.println(aux);
+                dados.adicionaProdutoLoja(x,tokens.get(3));
+                x.setQuantidade(Float.parseFloat(tokens.get(i++)));
 
+                aux.add(x);
+
+
+            }
             enc.setProdutos(aux);
+
 
             dados.adicionaEncomenda(enc);
 

@@ -12,7 +12,7 @@ public class Loja extends Ator implements Serializable {
     private int fila;
     private float espera; //tempo médio de espera por cliente
     private Map<String,Encomenda> encomendas;
-    private List<Produto> produtos;
+    private Map<String,Produto> produtos;
 
 
 
@@ -23,12 +23,12 @@ public class Loja extends Ator implements Serializable {
         this.fila = 0;
         this.espera = 0;
         this.encomendas = new HashMap<>();
-        this.produtos = new ArrayList<>();
+        this.produtos = new HashMap<>();
 
     }
 
 
-    public Loja(String email, String nome,String referencia,String password, Point2D.Double morada, long nif, int fila, float espera, Map<String,Encomenda> enc, List <Produto> prods) {
+    public Loja(String email, String nome,String referencia,String password, Point2D.Double morada, long nif, int fila, float espera, Map<String,Encomenda> enc, Map<String,Produto> prods) {
         super(email,referencia,nome,password,morada,nif);
 
         this.fila = fila;
@@ -40,12 +40,10 @@ public class Loja extends Ator implements Serializable {
 
     public Loja (Loja a) {
         super(a.getEmail(), a.getReferencia(),a.getNome(),a.getPassword(),a.getMorada(),a.getNif());
-
-
-    setFila(a.getFila());
-    setEspera(a.getEspera());
-    this.encomendas = a.getEncomendas();
-    this.produtos = a.getProdutos();
+        setFila(a.getFila());
+        setEspera(a.getEspera());
+        this.encomendas = a.getEncomendas();
+        this.produtos = a.getProdutos();
 
     }
 
@@ -80,16 +78,16 @@ public class Loja extends Ator implements Serializable {
                 e.getValue().clone()));
     }
 
-    public List<Produto> getProdutos(){
-        ArrayList<Produto> lst = new ArrayList<>();
-        for(Produto p: this.produtos)
-            lst.add(p.clone());
-        return lst;
+    public Map<String,Produto> getProdutos(){
+        Map<String,Produto> aux = new HashMap<>();
+        for (Map.Entry<String,Produto> e : this.produtos.entrySet())
+            aux.put(e.getKey(),e.getValue().clone());
+        return aux;
     }
 
     public String navString(){
         StringBuilder sb = new StringBuilder();
-        sb.append(this.getReferencia()+"  "+ this.getNome()+ "  " + this.getEspera());
+        sb.append(this.getReferencia()+ "  " + this.getNome() + " com " + this.getEspera() + " minutos de fila de espera ");
         return sb.toString();
     }
     @Override
@@ -102,18 +100,19 @@ public class Loja extends Ator implements Serializable {
                 ;
     }
 
-    public void setProdutos(List<Produto> prod){
-        this.produtos = new ArrayList<>();
-
-        for(Produto p: prod)
-            this.produtos.add(p.clone());
+    public void setProdutos(Map<String,Produto>prod){
+        this.produtos = new HashMap<>();
+        prod.entrySet().forEach(e-> this.produtos.put(e.getKey(),
+                e.getValue().clone()));
     }
 
     /*Metodos*/
 
-
     public void adicionaEncomendaLoja(Encomenda e) {
         this.encomendas.put(e.getReferencia(),e.clone());
+    }
+    public void adicionaProdutoLoja(Produto e) {
+        this.produtos.put(e.getReferencia(),e.clone());
     }
 
 

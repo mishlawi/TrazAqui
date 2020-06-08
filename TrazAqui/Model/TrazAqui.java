@@ -293,6 +293,14 @@ public class TrazAqui implements Serializable {
         this.produtos.put(j.getReferencia(), j.clone());
     }
 
+    public void adicionaProdutoLoja(Produto j, String loja) {
+        Loja a = this.lojas.get(loja).clone();
+        System.out.println(a.getProdutos());
+        a.adicionaProdutoLoja(j.clone());
+        adicionaLoja(a);
+
+    }
+
     public List<Encomenda> getEncomendasNaoEfetuadas()
     {
         List<Encomenda> aux = new ArrayList<>();

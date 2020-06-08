@@ -184,7 +184,17 @@ public class Encomenda implements Serializable
     public void setCusto(){
         ArrayList<Double> aux = new ArrayList<>();
         for(Produto p:this.getProdutos())
-            aux.add(p.getPreco());
+            aux.add(p.getPreco()*p.getQuantidade());
+        double sum = 0;
+        for(Double d : aux)
+            sum += d;
+        this.custoProdutos= sum;
+    }
+
+    public void setPesoEncomenda(){
+        ArrayList<Double> aux = new ArrayList<>();
+        for(Produto p:this.getProdutos())
+            aux.add(( p.getPeso()*p.getQuantidade()));
         double sum = 0;
         for(Double d : aux)
             sum += d;
