@@ -1,8 +1,7 @@
 package Model;
 
 import java.io.Serializable;
-public class MailRegistadoException extends Exception implements Serializable
-{
+public class MailRegistadoException extends Exception implements Serializable{
     public MailRegistadoException(){
         super();
     }

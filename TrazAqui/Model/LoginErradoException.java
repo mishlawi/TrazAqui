@@ -2,7 +2,7 @@ package Model;
 import java.io.Serializable;
 
 
-public class LoginErradoException extends Exception
+public class LoginErradoException extends Exception implements Serializable
 {
 
     public LoginErradoException(){

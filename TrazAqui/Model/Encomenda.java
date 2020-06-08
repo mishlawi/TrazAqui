@@ -23,7 +23,8 @@ public class Encomenda implements Serializable
     private List<Produto> produtos;
     private double custoProdutos;
     private double custoTransporte;
-    private boolean efetuada;
+    private boolean aceiteTransportador;
+    private boolean entregaEfetuada;
 
     //Construtores
     
@@ -39,7 +40,8 @@ public class Encomenda implements Serializable
         this.produtos = new ArrayList<>();
         this.custoProdutos = 0;
         this.custoTransporte =0;
-        this.efetuada = false;
+        this.aceiteTransportador =false;
+        this.entregaEfetuada = false;
 
     }
     
@@ -54,7 +56,8 @@ public class Encomenda implements Serializable
        setProdutos(lst);
        this.custoProdutos = custoProdutos;
        this.custoTransporte = custoTransporte;
-       this.efetuada = efetuada;
+       this.aceiteTransportador =false;
+       this.entregaEfetuada = efetuada;
     }
 
 
@@ -69,7 +72,7 @@ public class Encomenda implements Serializable
        this.produtos=a.getProdutos();
        this.custoProdutos = a.getCusto();
        this.custoTransporte = a.getCustoTransporte();
-       this.efetuada = a.isEfetuada();
+       this.entregaEfetuada = a.isEfetuada();
 
     }
     
@@ -92,6 +95,18 @@ public class Encomenda implements Serializable
     public float getPeso(){
 
         return this.peso;
+    }
+
+    public double getCustoProdutos() {
+        return custoProdutos;
+    }
+
+    public boolean isAceiteTransportador() {
+        return aceiteTransportador;
+    }
+
+    public boolean isEntregaEfetuada() {
+        return entregaEfetuada;
     }
 
     public LocalDateTime getData() {
@@ -118,7 +133,7 @@ public class Encomenda implements Serializable
     }
 
     public boolean isEfetuada() {
-        return efetuada;
+        return entregaEfetuada;
     }
 
     public void setData(LocalDateTime data) {
@@ -157,7 +172,7 @@ public class Encomenda implements Serializable
     }
 
     public void setEfetuada(boolean efetuada) {
-        this.efetuada = efetuada;
+        this.entregaEfetuada = efetuada;
     }
 
     public void setCustoTransporte(double custoTransporte) {
@@ -196,7 +211,7 @@ public class Encomenda implements Serializable
         Encomenda encomenda = (Encomenda) o;
         return Float.compare(encomenda.peso, peso) == 0 &&
                 Double.compare(encomenda.custoProdutos, custoProdutos) == 0 &&
-                efetuada == encomenda.efetuada &&
+                entregaEfetuada == encomenda.entregaEfetuada &&
                 comprador.equals(encomenda.comprador) &&
                 distribuidor.equals(encomenda.distribuidor) &&
                 loja.equals(encomenda.loja) &&
@@ -206,10 +221,7 @@ public class Encomenda implements Serializable
                 produtos.equals(encomenda.produtos);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(comprador, distribuidor, loja, referencia, peso, data, tempo, produtos, custoProdutos, efetuada);
-    }
+
 
     @Override
     public String toString() {
@@ -224,7 +236,7 @@ public class Encomenda implements Serializable
                 ", produtos=" + produtos +
                 ", custoProdutos=" + custoProdutos +
                 ", custoTransporte=" + custoTransporte +
-                ", efetuada=" + efetuada +
+                ", efetuada=" + entregaEfetuada +
                 '}';
     }
 

@@ -9,7 +9,6 @@ public class Loja extends Ator implements Serializable {
 
     //Variáveis de instância
 
-    private String referencia;
     private int fila;
     private float espera; //tempo médio de espera por cliente
     private Map<String,Encomenda> encomendas;
@@ -19,8 +18,8 @@ public class Loja extends Ator implements Serializable {
 
 
     public Loja(){
+        super();
 
-        this.referencia = "";
         this.fila = 0;
         this.espera = 0;
         this.encomendas = new HashMap<>();
@@ -29,9 +28,9 @@ public class Loja extends Ator implements Serializable {
     }
 
 
-    public Loja(String nome,String referencia, Point2D.Double moradaLoja, int fila, float espera, Map<String,Encomenda> enc, List <Produto> prods) {
+    public Loja(String email, String nome,String referencia,String password, Point2D.Double morada, long nif, int fila, float espera, Map<String,Encomenda> enc, List <Produto> prods) {
+        super(email,referencia,nome,password,morada,nif);
 
-        this.referencia =  referencia;
         this.fila = fila;
         this.espera = espera;
         this.encomendas = enc;
@@ -40,8 +39,9 @@ public class Loja extends Ator implements Serializable {
     }
 
     public Loja (Loja a) {
-    setNome(a.getNome());
-    setReferencia(a.getReferencia());
+        super(a.getEmail(), a.getReferencia(),a.getNome(),a.getPassword(),a.getMorada(),a.getNif());
+
+
     setFila(a.getFila());
     setEspera(a.getEspera());
     this.encomendas = a.getEncomendas();
@@ -50,17 +50,6 @@ public class Loja extends Ator implements Serializable {
     }
 
 
-
-
-
-
-    public String getReferencia(){
-        return this.referencia;
-    }
-
-    public void setReferencia(String referencia) {
-        this.referencia = referencia;
-    }
 
     public int getFila() {
         return fila;
@@ -98,6 +87,11 @@ public class Loja extends Ator implements Serializable {
         return lst;
     }
 
+    public String navString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.getReferencia()+"  "+ this.getNome()+ "  " + this.getEspera());
+        return sb.toString();
+    }
     @Override
     public String toString() {
         return super.toString()  +
@@ -125,7 +119,8 @@ public class Loja extends Ator implements Serializable {
 
 
     public Loja clone(){
-        return new Loja(this);
+
+    return new Loja(this);
     }
 
 

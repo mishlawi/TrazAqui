@@ -10,6 +10,7 @@ public class Produto implements Serializable {
     private float quantidade;
     private double preco;
     private boolean medicinal;
+    private float peso;
 
     public Produto(){
         this.referencia = "";
@@ -17,15 +18,17 @@ public class Produto implements Serializable {
         this.quantidade= 0;
         this.preco = 0;
         this.medicinal = false;
+        this.peso = 0;
     }
 
 
-    public Produto(String referencia, String nome, float quantidade, double preco ,boolean medicinal) {
+    public Produto(String referencia, String nome, float quantidade, double preco ,boolean medicinal, float peso) {
         this.referencia = referencia;
         this.nome = nome;
         this.quantidade = quantidade;
         this.preco = preco;
         this.medicinal = medicinal;
+        this.peso = peso;
     }
 
     public Produto(Produto a){
@@ -34,6 +37,9 @@ public class Produto implements Serializable {
         this.quantidade = a.getQuantidade();
         this.preco = a.getPreco();
         this.medicinal = a.isMedicinal();
+        this.peso = a.getPeso();
+
+
     }
 
     //GETTER AND SETTER
@@ -80,6 +86,14 @@ public class Produto implements Serializable {
         this.referencia = referencia;
     }
 
+    public float getPeso() {
+        return peso;
+    }
+
+    public void setPeso(float peso) {
+        this.peso = peso;
+    }
+
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -87,6 +101,12 @@ public class Produto implements Serializable {
         return quantidade == produto.quantidade &&
                 medicinal == produto.medicinal &&
                 nome.equals(produto.nome);
+    }
+
+    public String navString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.getReferencia() + " " + this.getNome());
+        return sb.toString();
     }
 
     @Override
