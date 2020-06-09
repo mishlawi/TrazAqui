@@ -295,7 +295,6 @@ public class TrazAqui implements Serializable {
 
     public void adicionaProdutoLoja(Produto j, String loja) {
         Loja a = this.lojas.get(loja).clone();
-        System.out.println(a.getProdutos());
         a.adicionaProdutoLoja(j.clone());
         adicionaLoja(a);
 
@@ -401,7 +400,7 @@ public class TrazAqui implements Serializable {
     {
         if(this.getTransportadorEmail().containsKey(v.getEmail())) throw new MailRegistadoException("Email voluntario já registado");
         this.transporte.put(v.getReferencia(), v.clone());
-        System.out.println(this.getVoluntariosTransporte());
+
     }
 
     public void registarEmpresaEmail (EmpresaTransportadora e) throws MailRegistadoException
@@ -449,7 +448,7 @@ public class TrazAqui implements Serializable {
     public void iniciaSessaoL(String email, String password) throws LoginErradoException
     {
         Loja l = this.getLojasEmail().get(email);
-        System.out.println(l);
+
         if (l==null) throw new LoginErradoException("Email loja não registado");
         if(l.getPassword().equals(password)) this.lojaIn = l;
         else  throw new LoginErradoException("Password errada");
@@ -628,12 +627,25 @@ public class TrazAqui implements Serializable {
         Map<String, Transporte> map1 = EncomendaTransporte(a);
         String aux = "";
         double distancia = 0;
+
+        List<Double> l1;
+        l1 = map1.values().stream().mapToDouble(e-> e.distancia(a)).boxed().collect(Collectors.toList());
+
+        distancia = l1.get(1);
+
+        for(int i =0;i<l1.size();i++) {
+            if(distancia < l1.get(i))
+                distancia = l1.get(i);
+            }
+
+
         for (Map.Entry<String, Transporte> e : map1.entrySet()) {
-            if (e.getValue().distancia(this.getEncomenda().clone()) > distancia) {
+            if (e.getValue().distancia(a) == distancia) {
                 distancia = e.getValue().distancia(a);
                 aux = e.getKey();
             }
         }
+
         return map1.get(aux);
     }
 
@@ -642,6 +654,7 @@ public class TrazAqui implements Serializable {
         Map<String, Transporte> map1 = EncomendaVoluntarios(a);
         String aux = "";
         double distancia = 0;
+
         for (Map.Entry<String, Transporte> e : map1.entrySet()) {
             if (e.getValue().distancia(this.getEncomenda().clone()) > distancia) {
                 distancia = e.getValue().distancia(a);
@@ -658,13 +671,14 @@ public class TrazAqui implements Serializable {
     }
 
 
-    public void geraReferenciaEncomenda(Encomenda a){
+    public Encomenda geraReferenciaEncomenda(Encomenda a){
         StringBuilder sb = new StringBuilder();
         int sizeMap = this.getEncomendas().size();
 
         while(this.getEncomendas().containsKey((sb.append("e"+ sizeMap)).toString()))
             sizeMap++;
         a.setReferencia((sb.toString()));
+        return a;
     }
 
     public User geraReferenciaUser(User e){
@@ -694,7 +708,7 @@ public class TrazAqui implements Serializable {
         while(this.getEncomendas().containsKey((sb.append("l"+ sizeMap)).toString()))
             sizeMap++;
         l.setReferencia((sb.toString()));
-        System.out.println(l);
+
         return l;
     }
 
@@ -768,6 +782,12 @@ public class TrazAqui implements Serializable {
     {
         String referencia=this.encomenda.getLoja().getReferencia();
         this.lojas.get(referencia).adicionaEncomendaLoja(this.encomenda);
+    }
+
+    public void addRegistoPedidoTransportador (Transporte a)
+    {
+       String referencia = a.getReferencia();
+        this.transporte.get(referencia).adicionaEncomendaTransporte(this.encomenda);
     }
 
     public User ShowDadosU()

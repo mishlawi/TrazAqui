@@ -1,6 +1,7 @@
 package Model;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.Objects;
 
 public class Produto implements Serializable {
@@ -103,8 +104,9 @@ public class Produto implements Serializable {
     }
 
     public String navString() {
+        DecimalFormat df = new DecimalFormat("####0.00");
         StringBuilder sb = new StringBuilder();
-        sb.append(this.getReferencia() + " " + this.getNome() + " " + this.getPreco());
+        sb.append(this.getReferencia() + " " + this.getNome() + " " + df.format(this.getPreco()));
         return sb.toString();
     }
 

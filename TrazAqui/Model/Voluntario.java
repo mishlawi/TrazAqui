@@ -29,11 +29,6 @@ public class Voluntario extends Transporte implements Serializable
 
     }
 
-    // Getters
-
-
-
-
 
     @Override
     public String toString() {

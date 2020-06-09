@@ -45,7 +45,7 @@ public class Encomenda implements Serializable
 
     }
     
-    public Encomenda(User comprador, Transporte distribuidor, Loja loja, Point2D.Double moradaLoja, Point2D.Double moradaUtilizador, String referencia, float peso, LocalDateTime date, Duration tempo, List<Produto> lst,double custoProdutos, double custoTransporte, boolean efetuada){
+    public Encomenda(User comprador, Transporte distribuidor, Loja loja, Point2D.Double moradaLoja, Point2D.Double moradaUtilizador, String referencia, float peso, LocalDateTime date, Duration tempo, List<Produto> lst,double custoProdutos, double custoTransporte, boolean aceite, boolean efetuada){
        this.comprador = comprador;
        this.distribuidor = distribuidor;
        this.loja = loja;
@@ -56,7 +56,7 @@ public class Encomenda implements Serializable
        setProdutos(lst);
        this.custoProdutos = custoProdutos;
        this.custoTransporte = custoTransporte;
-       this.aceiteTransportador =false;
+       this.aceiteTransportador = aceite;
        this.entregaEfetuada = efetuada;
     }
 
@@ -72,6 +72,7 @@ public class Encomenda implements Serializable
        this.produtos=a.getProdutos();
        this.custoProdutos = a.getCusto();
        this.custoTransporte = a.getCustoTransporte();
+       this.aceiteTransportador = a.isAceiteTransportador();
        this.entregaEfetuada = a.isEfetuada();
 
     }
@@ -183,6 +184,7 @@ public class Encomenda implements Serializable
 
     public void setCusto(){
         ArrayList<Double> aux = new ArrayList<>();
+
         for(Produto p:this.getProdutos())
             aux.add(p.getPreco()*p.getQuantidade());
         double sum = 0;
@@ -201,6 +203,9 @@ public class Encomenda implements Serializable
         this.custoProdutos= sum;
     }
 
+    public void setAceiteTransportador(boolean aceiteTransportador) {
+        this.aceiteTransportador = aceiteTransportador;
+    }
 
     public void DefineEncomenda(List<Produto> p, User u, Loja l, Transporte t, float peso){
 
@@ -230,7 +235,6 @@ public class Encomenda implements Serializable
                 tempo.equals(encomenda.tempo) &&
                 produtos.equals(encomenda.produtos);
     }
-
 
 
     @Override

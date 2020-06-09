@@ -17,7 +17,7 @@ public  class Transporte extends Ator implements Serializable {
     * Variaveis de instancia
      */
     private boolean disponibilidade;
-    private float raio;
+    private double raio;
     private boolean certeficado;
     private double classificacao;
     private int numeroEntregas;
@@ -39,7 +39,7 @@ public  class Transporte extends Ator implements Serializable {
 
     }
 
-    public Transporte(String email, String referencia, String nome, String password, Point2D.Double morada, long nif, boolean disponibilidade, float raio, boolean certeficado, double classificacao, int NumeroEntregas , double VelocidadeMedia, double nrKms,Map<String,Encomenda> encomendas) {
+    public Transporte(String email, String referencia, String nome, String password, Point2D.Double morada, long nif, boolean disponibilidade, double raio, boolean certeficado, double classificacao, int NumeroEntregas , double VelocidadeMedia, double nrKms,Map<String,Encomenda> encomendas) {
         super(email,referencia,nome,password, morada, nif);
         this.disponibilidade = disponibilidade;
         this.raio = raio;
@@ -84,7 +84,7 @@ public  class Transporte extends Ator implements Serializable {
         return disponibilidade;
     }
 
-    public float getRaio() {
+    public double getRaio() {
         return raio;
     }
 
@@ -109,7 +109,7 @@ public  class Transporte extends Ator implements Serializable {
         this.disponibilidade = disponibilidade;
     }
 
-    public void setRaio(float raio) {
+    public void setRaio(double raio) {
         this.raio = raio;
     }
 
@@ -180,7 +180,6 @@ public  class Transporte extends Ator implements Serializable {
 
     }
 
-
     public Duration tempoViagem(Encomenda a) {
 
     Double tempo = (a.getLoja().getMorada().distance(this.getMorada())*60)/this.getVelocidadeMedia();
@@ -199,7 +198,7 @@ public  class Transporte extends Ator implements Serializable {
     public Map<String,Encomenda> getEncomendasPedidas(){
         Map<String,Encomenda> aux = new HashMap<>();
         for (Map.Entry<String,Encomenda> e : this.encomendas.entrySet())
-            if(!e.getValue().isEfetuada()) aux.put(e.getKey(),e.getValue().clone());
+            if(!e.getValue().isAceiteTransportador()) aux.put(e.getKey(),e.getValue().clone());
         return aux;
     }
 

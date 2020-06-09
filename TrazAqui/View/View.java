@@ -8,7 +8,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.IllegalCharsetNameException;
+import java.text.DecimalFormat;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.awt.geom.Point2D;
 import java.time.LocalDate;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 import static java.lang.Double.parseDouble;
 import static java.lang.Float.parseFloat;
 import static java.lang.Long.parseLong;
+import static java.lang.System.exit;
+import static jdk.nashorn.internal.objects.NativeMath.round;
 
 
 public class View implements Serializable {
@@ -69,40 +73,81 @@ public class View implements Serializable {
 
     public static void main(String[] args) throws IOException {
 
-      /*  System.out.println("1-Ler ficheiro de logs?\n2-Prosseguir");
+        System.out.println("É necessária fazer uma leitura dos ficheiros de logs. Caso ja o tenha feito por favor prossiga\n1-Ler ficheiro de logs?\n2-Prosseguir");
         int a = Input.lerInt();
-        if (a == 1) {*/
+        if (a == 1) {
+            carregaDados();
 
-    //  carregaDados();
-      //  dados.gravar();
-        carregaMenus();
-        lerDadosGravados();
-        do {
-
-            principal.executa();
             try {
                 dados.gravar();
             } catch (IOException e) {
                 System.out.println("Falha gravar estado");
             }
 
-            switch (principal.getOp()) {
-                case 1:
-                    registar();
-                    break;
-                case 2:
-                    iniciaSessao();
-                    break;
-                case 3:
-                    showTop();
-                    break;
-                case 4:
-                    showTopKm();
-                    break;
-                default:
-                    System.out.println("Opção inválida.");
-            }
-        } while (principal.getOp() != 0);
+            carregaMenus();
+            lerDadosGravados();
+            do {
+
+                principal.executa();
+                try {
+
+                    dados.gravar();
+                } catch (IOException e) {
+                    System.out.println("Falha gravar estado");
+                }
+
+                switch (principal.getOp()) {
+                    case 1:
+                        registar();
+                        break;
+                    case 2:
+                        iniciaSessao();
+                        break;
+                    case 3:
+                        showTop();
+                        break;
+                    case 4:
+                        showTopKm();
+                        break;
+                    default:
+                        System.out.println("Opção inválida.");
+                }
+            } while (principal.getOp() != 0);
+        }
+
+        else{
+            carregaMenus();
+            lerDadosGravados();
+            do {
+
+                principal.executa();
+                try {
+
+                    dados.gravar();
+                } catch (IOException e) {
+                    System.out.println("Falha gravar estado");
+                }
+
+                switch (principal.getOp()) {
+                    case 1:
+                        registar();
+                        break;
+                    case 2:
+                        iniciaSessao();
+                        break;
+                    case 3:
+                        showTop();
+                        break;
+                    case 4:
+                        showTopKm();
+                        break;
+                    default:
+                        System.out.println("Opção inválida.");
+                }
+            } while (principal.getOp() != 0);
+
+        }
+
     }
 
     public static void encomendar() {
@@ -124,8 +169,6 @@ public class View implements Serializable {
 
         int produtos;
         List<String> b = dados.getLojas().get(x).getProdutos().values().stream().map(Produto::navString).collect(Collectors.toList());
-        System.out.println(b);
-        System.out.println("aaa");
 
         Navegador n2 = new Navegador(b,1,10);
         n2.run();
@@ -137,7 +180,7 @@ public class View implements Serializable {
         System.out.println("1. Indique o numero de produtos que pretende comprar");
         produtos = Input.lerInt();
         while (i < produtos) {
-            int j=i++;
+            int j=i+1;
 
             Produto p;
             int quantidade;
@@ -152,35 +195,37 @@ public class View implements Serializable {
             prod.add(p);
             i++;
         }
-
+        encomenda.setProdutos(prod);
+        System.out.println(encomenda);
         encomenda.setCusto(); //calcula o custo da encomenda
-        System.out.println("Custo total" + encomenda.getCusto());
+
+        DecimalFormat df = new DecimalFormat("####0.00");
+
+        System.out.println("Valor total dos seus produtos: " + df.format(encomenda.getCusto()) +"$");
         encomenda.setLoja(dados.getLojas().get(x));
         encomenda.setComprador(dados.getClienteIn());
         encomenda.setPesoEncomenda();
-        System.out.println("Peso total " + encomenda.getPeso());
-
+        encomenda.setData(LocalDateTime.now());
+        System.out.println("Peso total " + df.format(encomenda.getPeso()) + "kg");
         System.out.println("Produtos adicionados com sucesso");
+        encomenda  = dados.geraReferenciaEncomenda(encomenda);
+        System.out.println("Referencia da encomenda: " + encomenda.getReferencia());
 
-        dados.setEnc(encomenda); //encomenda a ser tratada
+        dados.setEnc(encomenda); //é a encomenda a ser tratada no traz aqui
 
-        int opcao;
-        System.out.println("1:Escolher transportador mais proximo");
-        System.out.println("2:Escolher Voluntario");
-        System.out.println("3:Escolher Empresa mais barata");
-        System.out.println("Opçao:");
-        opcao = Input.lerInt();
+        dados.addRegistoC(); //adiciona a encomenda ao registo do cliente
+        dados.addRegistoL(); //adiciona a encomenda aos registos da loja
+
+
         Transporte transportador = new Transporte();
-        if (opcao == 1)
-            transportador = dados.sortEncomendaTransporte(encomenda); //transportador mais proximo
-        if (opcao == 2) transportador = dados.sortEncomendaVoluntario(encomenda); //voluntario mais proximo
-        //if (opcao==3)
 
-        float peso;
-        System.out.println("Indique o peso aproximado da sua encomenda");
-        peso = Input.lerFloat();
+        transportador = dados.sortEncomendaTransporte(encomenda); //transportador mais proximo
 
-        encomenda.DefineEncomenda(prod, dados.getClienteIn(), loja, transportador, peso);
+        System.out.println(transportador);
+
+        dados.addRegistoPedidoTransportador(transportador);
+
+
 
         int nota;
 
@@ -188,7 +233,7 @@ public class View implements Serializable {
         encomenda.setTempo(duracaoViagem);
         encomenda.setEfetuada(false);
 
-        dados.setEnc(encomenda);
+
         dados.geraReferenciaEncomenda(encomenda);
 
         System.out.println("Classificação a atribuir ao Transportador:");
@@ -196,35 +241,54 @@ public class View implements Serializable {
 
         dados.daClassificacao(nota);
 
-        dados.addRegistoC();
+
 
         dados.addRegistoT();
 
-        dados.addRegistoL();
 
     }
 
     public static void pedidosEmpresa() {
 
 
-        int op;
+        int op,ref;
         if (dados.getEmpresaIn().getEncomendasPedidas().size() > 0) {
-            System.out.println("Aceitar pedido?(1)->Aceitar (2)->Recusar");
+            System.out.println("Existem pedidos prontos a serem processados\n(1)->Aceitar (2)->Recusar");
             op = Input.lerInt();
-            if (op == 1) dados.addEncomendaEmpresa();
+            if (op == 1) {
+                List a = dados.getEmpresaIn().getEncomendasPedidas().values().stream().collect(Collectors.toList());
+                Navegador n1 = new Navegador(a, 1, 5);
+                n1.run();
+                System.out.println("Indique a referencia da encomenda a aceitar");
+                ref = Input.lerInt();
+                Encomenda e  = dados.getEmpresaIn().getEncomendas().get(ref);
+                e.setAceiteTransportador(true);
+                System.out.println(e);
+                dados.setEnc(e);}
+
+
         } else System.out.println("Não tem pedidos");
 
     }
 
     public static void pedidosVoluntario() {
 
-
-        int op;
+        int op,ref;
         if (dados.getVoluntarioIn().getEncomendasPedidas().size() > 0) {
-            System.out.println("Aceitar pedido?(1)->Aceitar (2)->Recusar");
-
+            System.out.println("Existem pedidos prontos a serem processados\n(1)->Aceitar (2)->Recusar");
             op = Input.lerInt();
-            if (op == 1) dados.addEncomendaVoluntario();
+            if (op == 1) {
+                List a = dados.getVoluntarioIn().getEncomendasPedidas().values().stream().collect(Collectors.toList());
+                Navegador n1 = new Navegador(a, 1, 5);
+                n1.run();
+                System.out.println("Indique a referencia da encomenda a aceitar");
+                ref = Input.lerInt();
+                Encomenda e  = dados.getEmpresaIn().getEncomendas().get(ref);
+                e.setAceiteTransportador(true);
+                System.out.println(e);
+                dados.setEnc(e);}
+
+
         } else System.out.println("Não tem pedidos");
 
     }
@@ -502,8 +566,9 @@ public class View implements Serializable {
                 }
             }
             if (op == 2) {
-                double taxa=0;
-
+                double taxa,raio;
+                System.out.println("Insira o seu raio de acao");
+                raio = Input.lerDouble();
                     System.out.println("Insira a taxa de transporte que pretende (0-15) (%)");
                     taxa = Input.lerDouble();
                     if (taxa>15) {
@@ -766,12 +831,12 @@ public class View implements Serializable {
             coordenadas.setLocation(x, y);
             l.setMorada(coordenadas);
 
-            // System.out.println(l);
+
 
             try {
                 dados.RegistaLoja(l);
                 System.out.println("Loja Registada com sucesso");
-                //System.out.println(dados.getLojas());
+
             } catch (Exception e) {
                 System.out.println(e);
             }
