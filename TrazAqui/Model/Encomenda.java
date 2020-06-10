@@ -17,7 +17,7 @@ public class Encomenda implements Serializable
     private Transporte distribuidor; //vai ter o email da empresa/voluntario que efetuou a ecomenda
     private Loja loja; //email da loja a que foi comprado
     private String referencia;
-    private float peso;
+    private double peso;
     private LocalDateTime data; //DD-MM-AA H:M:S a que a encomenda foi feita
     private Duration tempo; //tempo que demorou o transporte de uma entrega
     private List<Produto> produtos;
@@ -25,6 +25,7 @@ public class Encomenda implements Serializable
     private double custoTransporte;
     private boolean aceiteTransportador;
     private boolean entregaEfetuada;
+    private boolean aceiteCliente;
 
     //Construtores
     
@@ -42,10 +43,12 @@ public class Encomenda implements Serializable
         this.custoTransporte =0;
         this.aceiteTransportador =false;
         this.entregaEfetuada = false;
+        this.aceiteCliente = false;
+
 
     }
     
-    public Encomenda(User comprador, Transporte distribuidor, Loja loja, Point2D.Double moradaLoja, Point2D.Double moradaUtilizador, String referencia, float peso, LocalDateTime date, Duration tempo, List<Produto> lst,double custoProdutos, double custoTransporte, boolean aceite, boolean efetuada){
+    public Encomenda(User comprador, Transporte distribuidor, Loja loja, String referencia, double peso, LocalDateTime date, Duration tempo, List<Produto> lst,double custoProdutos, double custoTransporte, boolean aceite, boolean efetuada, boolean aceitecliente){
        this.comprador = comprador;
        this.distribuidor = distribuidor;
        this.loja = loja;
@@ -58,6 +61,7 @@ public class Encomenda implements Serializable
        this.custoTransporte = custoTransporte;
        this.aceiteTransportador = aceite;
        this.entregaEfetuada = efetuada;
+       this.aceiteCliente = aceitecliente;
     }
 
 
@@ -70,10 +74,11 @@ public class Encomenda implements Serializable
        this.data = a.getData();
        this.tempo = a.getTempo();
        this.produtos=a.getProdutos();
-       this.custoProdutos = a.getCusto();
+       this.custoProdutos = a.getCustoProdutos();
        this.custoTransporte = a.getCustoTransporte();
        this.aceiteTransportador = a.isAceiteTransportador();
        this.entregaEfetuada = a.isEfetuada();
+       this.aceiteCliente = a.isAceiteCliente();
 
     }
     
@@ -93,7 +98,7 @@ public class Encomenda implements Serializable
         return this.referencia;
     }
 
-    public float getPeso(){
+    public double getPeso(){
 
         return this.peso;
     }
@@ -108,6 +113,10 @@ public class Encomenda implements Serializable
 
     public boolean isEntregaEfetuada() {
         return entregaEfetuada;
+    }
+
+    public boolean isAceiteCliente() {
+        return aceiteCliente;
     }
 
     public LocalDateTime getData() {
@@ -125,9 +134,6 @@ public class Encomenda implements Serializable
         return tempo;
     }
 
-    public double getCusto() {
-        return custoProdutos;
-    }
 
     public double getCustoTransporte(){
         return custoTransporte;
@@ -161,7 +167,7 @@ public class Encomenda implements Serializable
         this.referencia=referencia;
     }
     
-    public void setPeso(float peso){
+    public void setPeso(double peso){
         this.peso=peso;
     }
 
@@ -172,6 +178,10 @@ public class Encomenda implements Serializable
         this.produtos.add(p.clone());
     }
 
+    public void setAceiteCliente(boolean aceiteCliente) {
+        this.aceiteCliente = aceiteCliente;
+    }
+
     public void setEfetuada(boolean efetuada) {
         this.entregaEfetuada = efetuada;
     }
@@ -180,6 +190,9 @@ public class Encomenda implements Serializable
         this.custoTransporte = custoTransporte;
     }
 
+    public void setCustoProdutos(double custoProdutos) {
+        this.custoProdutos = custoProdutos;
+    }
     /*metodos*/
 
     public void setCusto(){
@@ -188,9 +201,13 @@ public class Encomenda implements Serializable
         for(Produto p:this.getProdutos())
             aux.add(p.getPreco()*p.getQuantidade());
         double sum = 0;
-        for(Double d : aux)
+        for(Double d : aux){
+
             sum += d;
-        this.custoProdutos= sum;
+            }
+
+            setCustoProdutos(sum);
+
     }
 
     public void setPesoEncomenda(){
@@ -200,17 +217,17 @@ public class Encomenda implements Serializable
         double sum = 0;
         for(Double d : aux)
             sum += d;
-        this.custoProdutos= sum;
+        this.setPeso(sum);
     }
 
     public void setAceiteTransportador(boolean aceiteTransportador) {
         this.aceiteTransportador = aceiteTransportador;
     }
 
-    public void DefineEncomenda(List<Produto> p, User u, Loja l, Transporte t, float peso){
+    public void DefineEncomenda(List<Produto> p, User u, Loja l, double custo,  double peso){
 
         this.setLoja(l);
-        this.setDistribuidor(t);
+        this.setCusto();
         this.setComprador(u);
         this.setProdutos(p);
         this.setData(LocalDateTime.now()); //data e hora do pedido
@@ -224,17 +241,20 @@ public class Encomenda implements Serializable
         if (this == o) return true;
         if (!(o instanceof Encomenda)) return false;
         Encomenda encomenda = (Encomenda) o;
-        return Float.compare(encomenda.peso, peso) == 0 &&
-                Double.compare(encomenda.custoProdutos, custoProdutos) == 0 &&
-                entregaEfetuada == encomenda.entregaEfetuada &&
-                comprador.equals(encomenda.comprador) &&
-                distribuidor.equals(encomenda.distribuidor) &&
-                loja.equals(encomenda.loja) &&
-                referencia.equals(encomenda.referencia) &&
-                data.equals(encomenda.data) &&
-                tempo.equals(encomenda.tempo) &&
-                produtos.equals(encomenda.produtos);
+        return Double.compare(encomenda.getPeso(), getPeso()) == 0 &&
+                Double.compare(encomenda.getCustoProdutos(), getCustoProdutos()) == 0 &&
+                Double.compare(encomenda.getCustoTransporte(), getCustoTransporte()) == 0 &&
+                isAceiteTransportador() == encomenda.isAceiteTransportador() &&
+                isEntregaEfetuada() == encomenda.isEntregaEfetuada() &&
+                getComprador().equals(encomenda.getComprador()) &&
+                getDistribuidor().equals(encomenda.getDistribuidor()) &&
+                getLoja().equals(encomenda.getLoja()) &&
+                getReferencia().equals(encomenda.getReferencia()) &&
+                getData().equals(encomenda.getData()) &&
+                getTempo().equals(encomenda.getTempo()) &&
+                getProdutos().equals(encomenda.getProdutos());
     }
+
 
 
     @Override
@@ -243,7 +263,7 @@ public class Encomenda implements Serializable
                 "comprador=" + comprador +
                 ", distribuidor=" + distribuidor +
                 ", loja=" + loja +
-                ", referencia='" + referencia + '\'' +
+                ", referencia='" + referencia +
                 ", peso=" + peso +
                 ", data=" + data +
                 ", tempo=" + tempo +
@@ -252,6 +272,27 @@ public class Encomenda implements Serializable
                 ", custoTransporte=" + custoTransporte +
                 ", efetuada=" + entregaEfetuada +
                 '}';
+    }
+
+    public String toStringNav() {
+        return  "comprador=" + this.getComprador().getNome() +
+                ", loja=" + this.getLoja().getNome() +
+                ", referencia='" + referencia + '\'' +
+                ", peso=" + peso +
+                ", pedido feito em " + this.getData().toLocalDate()
+                + " às " + this.getData().toLocalTime()
+                ;
+    }
+
+    public String toStringNavpreco() {
+        return  ", loja=" + this.getLoja().getNome() +
+                " referencia='" + referencia + '\'' +
+                "peso=" + peso +
+                " requesitado em " + this.getData().toLocalDate()
+                + " às " + this.getData().toLocalTime() +
+                " valor unidades " + this.getCustoProdutos() +
+                " valor transporte " +this.getCustoTransporte()
+                ;
     }
 
     public Encomenda clone(){

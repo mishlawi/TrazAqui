@@ -18,12 +18,11 @@ public class TrazAqui implements Serializable {
     private Map<String,User> users;
     private Map<String,Transporte> transporte; // k: email
     private Map<String,Encomenda> encomendas; //k: referencia da encomenda
-    private Map<String,Produto> produtos;
     private User userIn;
     private Voluntario voluntarioIn;
     private EmpresaTransportadora empresaIn;
     private Loja lojaIn;
-    private Admin adminIn;
+
     private Encomenda encomenda;
 
 
@@ -33,7 +32,6 @@ public class TrazAqui implements Serializable {
         this.users = new HashMap<>();
         this.transporte = new HashMap<>();
         this.encomendas = new HashMap<>();
-        this.produtos = new HashMap<>();
         this.userIn = new User();
         this.voluntarioIn = new Voluntario();
         this.empresaIn = new EmpresaTransportadora();
@@ -44,11 +42,10 @@ public class TrazAqui implements Serializable {
     }
 
 
-    public TrazAqui(Map<String, Loja> lojas, Map<String, User> users,Map<String,Produto> produtos, User userIn, EmpresaTransportadora empresa, Voluntario voluntario, Loja loja, Map<String, Encomenda> encomendas, Encomenda enc) {
+    public TrazAqui(Map<String, Loja> lojas, Map<String, User> users, User userIn, EmpresaTransportadora empresa, Voluntario voluntario, Loja loja, Map<String, Encomenda> encomendas, Encomenda enc) {
         this.lojas = lojas;
         this.users = users;
         this.encomendas = encomendas;
-        this.produtos = produtos;
         this.userIn = userIn;
         this.voluntarioIn = voluntario;
         this.empresaIn = empresa;
@@ -59,7 +56,6 @@ public class TrazAqui implements Serializable {
     public TrazAqui(TrazAqui db) {
         this.lojas = db.getLojas();
         this.users = db.getUsers();
-        this.produtos = db.getProdutos();
         this.transporte = db.getTransportador();
         this.encomendas = db.getEncomendas();
         this.userIn = db.getClienteIn();
@@ -94,12 +90,7 @@ public class TrazAqui implements Serializable {
         return aux;
     }
 
-    public Map<String, Produto> getProdutos() {
-        Map <String,Produto> aux = new HashMap<>();
-        for(Map.Entry<String,Produto> e:this.produtos.entrySet())
-            aux.put(e.getKey(),e.getValue().clone());
-        return aux;
-    }
+
 
     public Map<String, User> getUsersEmail() {
         Map <String,User> aux = new HashMap<>();
@@ -289,9 +280,6 @@ public class TrazAqui implements Serializable {
         this.lojas.put(j.getReferencia(), j.clone());
     }
 
-    public void adicionaProduto(Produto j) {
-        this.produtos.put(j.getReferencia(), j.clone());
-    }
 
     public void adicionaProdutoLoja(Produto j, String loja) {
         Loja a = this.lojas.get(loja).clone();
@@ -623,18 +611,18 @@ public class TrazAqui implements Serializable {
 
     //escolhe o transportador ( voluntario ou empresa) que percorre menos distancia ate à encomenda a
     public Transporte sortEncomendaTransporte(Encomenda a) {
-
         Map<String, Transporte> map1 = EncomendaTransporte(a);
         String aux = "";
         double distancia = 0;
 
         List<Double> l1;
+        List<String> l2;
         l1 = map1.values().stream().mapToDouble(e-> e.distancia(a)).boxed().collect(Collectors.toList());
-
+        l2 = map1.values().stream().map(e-> e.getReferencia()).collect(Collectors.toList());
         distancia = l1.get(1);
 
         for(int i =0;i<l1.size();i++) {
-            if(distancia < l1.get(i))
+            if(distancia > l1.get(i))
                 distancia = l1.get(i);
             }
 
@@ -643,11 +631,28 @@ public class TrazAqui implements Serializable {
             if (e.getValue().distancia(a) == distancia) {
                 distancia = e.getValue().distancia(a);
                 aux = e.getKey();
+
             }
         }
 
         return map1.get(aux);
     }
+
+    public Transporte sortEncomendaTransporteExp(Encomenda a, String f){
+        Map<String, Transporte> map1 = EncomendaTransporte(a);
+        String aux = "";
+        double distancia = 0;
+
+        for (Map.Entry<String, Transporte> e : map1.entrySet()) {
+            if (!e.getKey().equals(f)) {
+                aux = e.getKey();
+            }
+
+            }
+        return map1.get(aux);
+    }
+
+
 
     public Transporte sortEncomendaVoluntario(Encomenda a) {
 
@@ -665,10 +670,6 @@ public class TrazAqui implements Serializable {
     }
 
 
-    public void daClassificacao(int classificacao){
-        String classificado = this.getEncomenda().getDistribuidor().getReferencia();
-        this.getTransportador().get(classificado).setClassificacao(classificacao);
-    }
 
 
     public Encomenda geraReferenciaEncomenda(Encomenda a){
@@ -691,11 +692,11 @@ public class TrazAqui implements Serializable {
         return e;
     }
 
-    public Produto geraReferenciaProduto(Produto a){
+    public Produto geraReferenciaProduto(Produto a,Loja b){
         StringBuilder sb = new StringBuilder();
-        int sizeMap = this.getProdutos().size();
+        int sizeMap = b.getProdutos().size();
 
-        while(this.getProdutos().containsKey((sb.append("p"+ sizeMap)).toString()))
+        while(b.getProdutos().containsKey((sb.append("p"+ sizeMap)).toString()))
             sizeMap++;
         a.setReferencia((sb.toString()));
         return a;

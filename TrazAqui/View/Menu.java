@@ -15,7 +15,7 @@ public class Menu implements Serializable
 
 
     public Menu(String[] opcoes){
-        this.opcoes=new ArrayList<String>();
+        this.opcoes=new ArrayList<>();
         for(String op: opcoes)
             this.opcoes.add(op);
 

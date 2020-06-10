@@ -118,9 +118,6 @@ public  class Transporte extends Ator implements Serializable {
     }
 
 
-
-
-
     public void setNumeroEntregas(int numeroEntregas) {
         this.numeroEntregas = numeroEntregas;
     }
@@ -165,7 +162,8 @@ public  class Transporte extends Ator implements Serializable {
 
     //Distancia morada transportador -> loja ; loja -> utilizador
     public double distancia (Encomenda a){
-       return  a.getLoja().getMorada().distance(this.getMorada())+a.getLoja().getMorada().distance(a.getComprador().getMorada());
+       return  a.getLoja().getMorada().distance(this.getMorada()); //.distance(a.getComprador().getMorada());
+
     }
 
     public boolean distanciaValida(Encomenda a){
@@ -207,7 +205,9 @@ public  class Transporte extends Ator implements Serializable {
                 sorted(new DataComparator()).collect(Collectors.toList());
     }
 
-
+    public void removeEncomendaTransportador(Encomenda e) {
+        this.getEncomendas().remove(e.getReferencia());
+    }
 
 /*
     public void encomendaEntregue (Encomenda a, Servico s){
@@ -220,6 +220,19 @@ public  class Transporte extends Ator implements Serializable {
 
     }
 */
+
+    @Override
+    public String toString() {
+        return "Transporte{" +
+                "disponibilidade=" + disponibilidade +
+                ", raio=" + raio +
+                ", certeficado=" + certeficado +
+                ", classificacao=" + classificacao +
+                ", numeroEntregas=" + numeroEntregas +
+                ", velocidadeMedia=" + velocidadeMedia +
+                ", numeroKms=" + numeroKms +
+                '}';
+    }
 
     /**
      * outros

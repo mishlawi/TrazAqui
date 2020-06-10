@@ -78,7 +78,7 @@ public class Loja extends Ator implements Serializable {
                 e.getValue().clone()));
     }
 
-    public Map<String,Produto> getProdutos(){
+    public Map<String,Produto> getProdutos()  {
         Map<String,Produto> aux = new HashMap<>();
         for (Map.Entry<String,Produto> e : this.produtos.entrySet())
             aux.put(e.getKey(),e.getValue().clone());
