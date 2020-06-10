@@ -221,7 +221,9 @@ public class View implements Serializable {
 
         if(transportador instanceof Voluntario) {
             encomenda.setAceiteTransportador(true);
+            System.out.println("a");
             encomenda.setAceiteCliente(true);
+            System.out.println("a");
             encomenda.setDistribuidor(transportador);
             transportador.setDisponibilidade(false);
             encomenda.setTempo(transportador.tempoViagem(encomenda));
@@ -264,12 +266,12 @@ public class View implements Serializable {
                 ref = Input.lerString();
                 Encomenda e = dados.getEmpresaIn().getEncomendas().get(ref);
                 System.out.println(e.toStringNavpreco());
+                e.setDistribuidor(dados.getEmpresaIn());
                 e.setCustoTransporte(dados.getEmpresaIn().defineCusto(e));
                 e.setAceiteTransportador(true);
                 dados.setEnc(e);
                 dados.addRegistoC();
-
-
+                dados.adicionaEncomenda(e);
                 System.out.println("Encomenda aceite, aguarde confirmação do cliente");
             }
                 if (op==2) {
@@ -295,17 +297,77 @@ public class View implements Serializable {
 
 
     public static void pedidos() {
-        List<String> aceites = dados.getClienteIn().getEncomendas().values().stream().filter(e -> e.isAceiteTransportador() == true).map(Encomenda::toStringNavpreco).collect(Collectors.toList());
+        List<String> aceites = dados.getClienteIn().getEncomendas().values().stream().filter(e -> e.isAceiteTransportador() == true && !e.isAceiteCliente()).map(Encomenda::toStringNavpreco).collect(Collectors.toList());
+        if (aceites.size()>0){
+            System.out.println("Existem produtos aceites pelo transportador");
         Navegador n1 = new Navegador(aceites, 1, 5);
         n1.run();
-        System.out.println("Confirme a encomenda em que aceita o transporte pago");
-        String ref = Input.lerString();
-        Encomenda a = dados.getEncomendas().get(ref);
-        a.setAceiteCliente(true);
-        dados.addRegistoC();
-        dados.addRegistoL();
-        dados.addRegistoT();
+        System.out.println("(1)->Aceitar (2)->Recusar");
+        int op = Input.lerInt();
+
+        if (op == 1) {
+            System.out.println("Confirme a encomenda em que aceita o transporte pago");
+            String ref = Input.lerString();
+            Encomenda encomenda = dados.getEncomendas().get(ref);
+            System.out.println(encomenda);
+            encomenda.setAceiteCliente(true);
+            String referencia = encomenda.getDistribuidor().getReferencia();
+            if (dados.getTransportador().get(referencia) instanceof EmpresaTransportadora) {
+                EmpresaTransportadora e = (EmpresaTransportadora) encomenda.getDistribuidor();
+                System.out.println("a");
+                encomenda.setAceiteCliente(true);
+                System.out.println("a");
+                encomenda.setDistribuidor(e);
+                e.setDisponibilidade(false);
+                System.out.println("a");
+                encomenda.setTempo(e.tempoViagem(encomenda));
+                System.out.println("a");
+                e.addKms(encomenda);
+                Double custo = encomenda.getCustoProdutos() + encomenda.getCustoTransporte();
+                System.out.println("A");
+
+                encomenda.setEfetuada(true);
+
+                System.out.println("Viagem concluida. O seu pedido foi realizado com sucesso" + "\nDuração da viagem: " + encomenda.getTempo()  + "Custo total do seu pedido: " + custo
+                         + "\nClassificação a atribuir ao seu voluntario (0-5): ");
+                int i=0;
+                double y=0;
+                while(i!=1){
+                    y = Input.lerInt();
+                    if(y>0 && y<5) i=1;
+                }
+                e.setClassificacao(y);
+                System.out.println(e.getClassificacao());
+                e.setDisponibilidade(true);
+                dados.adicionaEncomenda(encomenda);
+                dados.addRegistoL();
+                dados.addRegistoC();
+                dados.addRegistoC();
+                dados.addRegistoL();
+                dados.addRegistoT();
+
+
+                dados.adicionaEncomenda(encomenda);
+            } else System.out.println("Algo correu mal!");
+        }
+
+
+
+        if (op==2) {
+            System.out.println("Confirme a encomenda em que rejeita o transporte pago");
+
+            String ref = Input.lerString();
+
+        }
+        }
+        else{
+            System.out.println("Sem pedidos");
+        }
+
+
     }
+
+
 
     /*
 
@@ -329,29 +391,6 @@ public class View implements Serializable {
 
 */
 
-    public static void pedidosVoluntario() {
-        int op,ref;
-        if (dados.getEmpresaIn().getEncomendasPedidas().size() > 0) {
-            System.out.println("Existem pedidos prontos a serem processados\n(1)->Aceitar (2)->Recusar");
-            op = Input.lerInt();
-            if (op == 1) {
-                List a = dados.getEmpresaIn().getEncomendasPedidas().values().stream().collect(Collectors.toList());
-                Navegador n1 = new Navegador(a, 1, 5);
-                n1.run();
-                System.out.println("Indique a referencia da encomenda a aceitar");
-                ref = Input.lerInt();
-                Encomenda e  = dados.getEmpresaIn().getEncomendas().get(ref);
-                e.setAceiteTransportador(true);
-                System.out.println(e);
-                dados.setEnc(e);
-                Voluntario empresa = dados.getVoluntarioIn();
-                empresa.setDisponibilidade(false);
-                dados.setVoluntarioIn(empresa);
-            }
-
-        } else System.out.println("Não tem pedidos");
-
-    }
 
 
 
@@ -388,12 +427,11 @@ public class View implements Serializable {
                     break;
                 case 4:
                     break;
-                case 0:
-                    break;
+
                 default:
                     System.out.println("Opção inválida.");
             }
-        } while (cliente.getOp() >= 0);
+        } while (cliente.getOp() != 0);
 
     }
     public static void perfilEmpresa() {
@@ -435,10 +473,7 @@ public class View implements Serializable {
                     showdadosV();
                     break;
                 case 2:
-                    showencguer(3);
-                    break;
-                case 3:
-                    showPreco();
+
                     break;
 
                 default:
@@ -531,13 +566,6 @@ public class View implements Serializable {
     }
 
     public static void totalFaturadoEmpresa() {
-        /*
-        String referencia;
-
-        System.out.println("Insira a sua referencia ");
-        referencia = Input.lerString();
-
-         */
         System.out.println("Total faturado pela empresa :" + dados.getEmpresaIn().getTotalFaturado());
 
     }
@@ -685,7 +713,9 @@ public class View implements Serializable {
 
             }
             if (op == 3) {
-
+                double raio;
+                System.out.println("Insira o seu raio de acao");
+                raio = Input.lerDouble();
 
                 Voluntario p = new Voluntario();
 
@@ -694,6 +724,7 @@ public class View implements Serializable {
                 p.setPassword(password);
                 p.setMorada(morada);
                 p.setNif(nif);
+                p.setRaio(raio);
                 p = dados.geraReferenciaTransportadorVoluntario(p);
 
 
@@ -939,12 +970,12 @@ public class View implements Serializable {
             p.setTaxa(Double.parseDouble(tokens.get(7)));
 
 
-            // System.out.println(p);
+
 
             try {
                 dados.registarEmpresa(p);
                 System.out.println("Transportadora Registado com sucesso");
-                //System.out.println(dados.getEmpresaTransporte());
+
             } catch (Exception e) {
                 System.out.println(e);
             }

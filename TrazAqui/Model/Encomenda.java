@@ -3,7 +3,7 @@ package Model;
 import java.awt.geom.Point2D;
 
 import java.io.Serializable;
-import java.time.Duration;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -19,7 +19,7 @@ public class Encomenda implements Serializable
     private String referencia;
     private double peso;
     private LocalDateTime data; //DD-MM-AA H:M:S a que a encomenda foi feita
-    private Duration tempo; //tempo que demorou o transporte de uma entrega
+    private double tempo; //tempo que demorou o transporte de uma entrega
     private List<Produto> produtos;
     private double custoProdutos;
     private double custoTransporte;
@@ -37,7 +37,7 @@ public class Encomenda implements Serializable
         this.referencia="";
         this.peso=0;
         this.data=null;//LocalDate.now();
-        this.tempo=null;
+        this.tempo=0;
         this.produtos = new ArrayList<>();
         this.custoProdutos = 0;
         this.custoTransporte =0;
@@ -48,7 +48,7 @@ public class Encomenda implements Serializable
 
     }
     
-    public Encomenda(User comprador, Transporte distribuidor, Loja loja, String referencia, double peso, LocalDateTime date, Duration tempo, List<Produto> lst,double custoProdutos, double custoTransporte, boolean aceite, boolean efetuada, boolean aceitecliente){
+    public Encomenda(User comprador, Transporte distribuidor, Loja loja, String referencia, double peso, LocalDateTime date, double tempo, List<Produto> lst,double custoProdutos, double custoTransporte, boolean aceite, boolean efetuada, boolean aceitecliente){
        this.comprador = comprador;
        this.distribuidor = distribuidor;
        this.loja = loja;
@@ -130,7 +130,7 @@ public class Encomenda implements Serializable
             return lst;
     }
 
-    public Duration getTempo() {
+    public double getTempo() {
         return tempo;
     }
 
@@ -159,7 +159,7 @@ public class Encomenda implements Serializable
         this.loja = loja;
     }
 
-    public void setTempo(Duration tempo) {
+    public void setTempo(double tempo) {
         this.tempo = tempo;
     }
 
@@ -236,24 +236,6 @@ public class Encomenda implements Serializable
     }
 
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Encomenda)) return false;
-        Encomenda encomenda = (Encomenda) o;
-        return Double.compare(encomenda.getPeso(), getPeso()) == 0 &&
-                Double.compare(encomenda.getCustoProdutos(), getCustoProdutos()) == 0 &&
-                Double.compare(encomenda.getCustoTransporte(), getCustoTransporte()) == 0 &&
-                isAceiteTransportador() == encomenda.isAceiteTransportador() &&
-                isEntregaEfetuada() == encomenda.isEntregaEfetuada() &&
-                getComprador().equals(encomenda.getComprador()) &&
-                getDistribuidor().equals(encomenda.getDistribuidor()) &&
-                getLoja().equals(encomenda.getLoja()) &&
-                getReferencia().equals(encomenda.getReferencia()) &&
-                getData().equals(encomenda.getData()) &&
-                getTempo().equals(encomenda.getTempo()) &&
-                getProdutos().equals(encomenda.getProdutos());
-    }
 
 
 

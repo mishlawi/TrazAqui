@@ -178,12 +178,13 @@ public  class Transporte extends Ator implements Serializable {
 
     }
 
-    public Duration tempoViagem(Encomenda a) {
+    public double tempoViagem(Encomenda a) {
 
-    Double tempo = (a.getLoja().getMorada().distance(this.getMorada())*60)/this.getVelocidadeMedia();
-    Duration duracao = Duration.ofMinutes(tempo.longValue());
 
-        return duracao;
+    double tempo = ((a.getLoja().getMorada().distance(this.getMorada())+a.getComprador().getMorada().distance(a.getLoja().getMorada()))*60)/this.getVelocidadeMedia();
+
+
+        return tempo;
     }
 
     public Map<String,Encomenda> getEncomendasEfetuadas(){
