@@ -2,13 +2,17 @@ package Model;
 
 import java.awt.geom.Point2D;
 import java.io.Serializable;
-import java.time.Duration;
-import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
+/**
+ * Classe Transporte
+ * @author grupo 115
+ */
 
 public  class Transporte extends Ator implements Serializable {
 
@@ -16,6 +20,7 @@ public  class Transporte extends Ator implements Serializable {
     /**
     * Variaveis de instancia
      */
+
     private boolean disponibilidade;
     private double raio;
     private boolean certeficado;
@@ -25,6 +30,9 @@ public  class Transporte extends Ator implements Serializable {
     private double numeroKms;
     private Map<String,Encomenda> encomendas;
 
+    /**
+     * Construtor por omissão
+     */
     public Transporte(){
         super();
         this.disponibilidade = true;
@@ -39,6 +47,23 @@ public  class Transporte extends Ator implements Serializable {
 
     }
 
+    /**
+     * Construtor parâmeterizado
+     * @param email
+     * @param referencia
+     * @param nome
+     * @param password
+     * @param morada
+     * @param nif
+     * @param disponibilidade
+     * @param raio
+     * @param certeficado
+     * @param classificacao
+     * @param NumeroEntregas
+     * @param VelocidadeMedia
+     * @param nrKms
+     * @param encomendas
+     */
     public Transporte(String email, String referencia, String nome, String password, Point2D.Double morada, long nif, boolean disponibilidade, double raio, boolean certeficado, double classificacao, int NumeroEntregas , double VelocidadeMedia, double nrKms,Map<String,Encomenda> encomendas) {
         super(email,referencia,nome,password, morada, nif);
         this.disponibilidade = disponibilidade;
@@ -51,6 +76,10 @@ public  class Transporte extends Ator implements Serializable {
         this.encomendas = encomendas;
     }
 
+    /**
+     * Construtor por cópia de objeto
+     * @param a
+     */
     public Transporte(Transporte a){
         super(a.getEmail(),a.getReferencia(),a.getNome(),a.getPassword(),a.getMorada(),a.getNif());
         this.disponibilidade = a.isDisponivel();
@@ -64,6 +93,10 @@ public  class Transporte extends Ator implements Serializable {
 
     }
 
+    /**
+     * getters e setters
+     *
+     */
     public Map<String,Encomenda> getEncomendas(){
         Map<String,Encomenda> aux = new HashMap<>();
         for(Map.Entry<String,Encomenda> e:this.encomendas.entrySet())
@@ -131,38 +164,34 @@ public  class Transporte extends Ator implements Serializable {
     }
 
 
-
-    /*metodos*/
+    /**
+     * Adiciona encomenda ao registo de encomendas
+     * @param e
+     */
 
     public void adicionaEncomendaTransporte(Encomenda e) {
         this.encomendas.put(e.getReferencia(),e.clone());
     }
 
+    /**
+     *
+     * @param a
+     */
     public void aceitaEncomenda(Encomenda a) {
         setDisponibilidade(false);
     }
 
-    public void encomendaConcluida() {
-        setDisponibilidade(true);
-    }
-
-    /*Aceitar encomendas do tipo médico*/
-
-    public void aceitaMedicamentos(boolean state){
-        setDisponibilidade(true);
-
-    }
 
     public void setClassificacao(double classificacao) {
-        //media = (x + y + z) / n
-        double anterior = getClassificacao()*this.getNumeroEntregas(); // = x+y+z
-        setNumeroEntregas(this.getNumeroEntregas()+1); //n+1
-        this.classificacao = (classificacao+anterior)/this.getNumeroEntregas();// = k+(x+y+z)/n+1
+
+        double anterior = getClassificacao()*this.getNumeroEntregas();
+        setNumeroEntregas(this.getNumeroEntregas()+1);
+        this.classificacao = (classificacao+anterior)/this.getNumeroEntregas();
     }
 
-    //Distancia morada transportador -> loja ; loja -> utilizador
+
     public double distancia (Encomenda a){
-       return  a.getLoja().getMorada().distance(this.getMorada()); //.distance(a.getComprador().getMorada());
+       return  a.getLoja().getMorada().distance(this.getMorada());
 
     }
 
@@ -170,10 +199,11 @@ public  class Transporte extends Ator implements Serializable {
         if (a.getLoja().getMorada().distance(this.getMorada())>getRaio()) return false;
         else return true;
     }
-    //Adiciona a distancia moradatransportador->loja -> utilizador
+
+
     public void addKms(Encomenda a){
         double b = this.getNumeroKms();
-        b+=distancia(a);
+        b+=distancia(a)+this.getMorada().distance(a.getComprador().getMorada());
         this.setNumeroKms(b);
 
     }
@@ -182,7 +212,18 @@ public  class Transporte extends Ator implements Serializable {
 
 
     double tempo = ((a.getLoja().getMorada().distance(this.getMorada())+a.getComprador().getMorada().distance(a.getLoja().getMorada()))*60)/this.getVelocidadeMedia();
-
+    tempo+=a.getLoja().tempoTotalEspera();
+        int atraso = ThreadLocalRandom.current().nextInt(0, 50);
+        if (atraso>0 && atraso < 10){
+            double c = tempo*(atraso/100);
+            tempo += c;
+            System.out.println("Ocorreu um atraso de " + c + " minutos devido a trafego intenso");
+        }
+        if (atraso>10 && atraso < 15){
+            double c = tempo*(atraso/100);
+            tempo += c;
+            System.out.println("Ocorreu um atraso de " + c + " minutos devido ao clima");
+        }
 
         return tempo;
     }
@@ -210,6 +251,9 @@ public  class Transporte extends Ator implements Serializable {
         this.encomendas.remove(e.getReferencia());
     }
 
+    public void setVelocidadeMedia(double velocidadeMedia) {
+        this.velocidadeMedia = velocidadeMedia;
+    }
 
     @Override
     public String toString() {
@@ -224,9 +268,6 @@ public  class Transporte extends Ator implements Serializable {
                 '}';
     }
 
-    /**
-     * outros
-     */
 
 
     public  Transporte clone(){

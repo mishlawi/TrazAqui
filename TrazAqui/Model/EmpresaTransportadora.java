@@ -81,7 +81,11 @@ public class EmpresaTransportadora extends Transporte
 /*Métodos*/
 
     public double defineCusto(Encomenda a ){
-    return ((this.getMorada().distance(a.getLoja().getMorada())+a.getLoja().getMorada().distance(a.getComprador().getMorada()))*this.getTaxa()+a.getPeso()*this.getTaxa());
+        double b = this.getMorada().distance(a.getLoja().getMorada())+a.getLoja().getMorada().distance(a.getComprador().getMorada())*this.getTaxa();
+        double c = a.getPeso()*this.getTaxa();
+        System.out.println(b);
+        System.out.println(c);
+        return b+c;
     }
 
     //adiciona valor de um transporte ao total faturado

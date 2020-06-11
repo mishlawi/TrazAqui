@@ -1,25 +1,31 @@
 package Model;
 
-import java.awt.geom.Point2D;
+
 
 import java.io.Serializable;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Collectors;
+
+
+/**
+ * Classe Encomenda
+ * @author grupo 115
+ */
+
 
 public class Encomenda implements Serializable
 {
-     //Variáveis de instância
-    private User comprador; //vai ter o email do utilizador
-    private Transporte distribuidor; //vai ter o email da empresa/voluntario que efetuou a ecomenda
-    private Loja loja; //email da loja a que foi comprado
+    /**
+     *Variáveis de instância
+     */
+
+    private User comprador;
+    private Transporte distribuidor;
+    private Loja loja;
     private String referencia;
     private double peso;
-    private LocalDateTime data; //DD-MM-AA H:M:S a que a encomenda foi feita
-    private double tempo; //tempo que demorou o transporte de uma entrega
+    private LocalDateTime data;
+    private double tempo;
     private List<Produto> produtos;
     private double custoProdutos;
     private double custoTransporte;
@@ -27,7 +33,9 @@ public class Encomenda implements Serializable
     private boolean entregaEfetuada;
     private boolean aceiteCliente;
 
-    //Construtores
+    /**
+     * Construtores
+     */
     
     public Encomenda(){
 
@@ -36,7 +44,7 @@ public class Encomenda implements Serializable
         this.loja = new Loja();
         this.referencia="";
         this.peso=0;
-        this.data=null;//LocalDate.now();
+        this.data=null;
         this.tempo=0;
         this.produtos = new ArrayList<>();
         this.custoProdutos = 0;
@@ -193,8 +201,11 @@ public class Encomenda implements Serializable
     public void setCustoProdutos(double custoProdutos) {
         this.custoProdutos = custoProdutos;
     }
-    /*metodos*/
 
+
+    /**
+     * metodos auxiliares
+     */
     public void setCusto(){
         ArrayList<Double> aux = new ArrayList<>();
 
@@ -223,19 +234,6 @@ public class Encomenda implements Serializable
     public void setAceiteTransportador(boolean aceiteTransportador) {
         this.aceiteTransportador = aceiteTransportador;
     }
-
-    public void DefineEncomenda(List<Produto> p, User u, Loja l, double custo,  double peso){
-
-        this.setLoja(l);
-        this.setCusto();
-        this.setComprador(u);
-        this.setProdutos(p);
-        this.setData(LocalDateTime.now()); //data e hora do pedido
-        this.setPeso(peso);
-
-    }
-
-
 
 
 

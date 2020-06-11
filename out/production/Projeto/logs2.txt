@@ -8,16 +8,21 @@ Utilizador:u78,LuÃ­s Pedro da Silva Vila,64.87256,43.373962,luluvila@gmail.com
 Utilizador:u40,LuÃ­s AnÃ­bal Barbosa de AraÃºjo,99.15073,-45.263195,luisaraujo@gmail.com,1111
 Utilizador:u68,Pedro GonÃ§alo dos Santos Pires Pinheiro,-71.837296,-29.223396,ppp@mail.com,ppp
 Utilizador:u81,Rui Pedro Neto Reis,-67.93489,99.649734,ruireis@mail.com,2222
-Voluntario:v20,JoÃ£o Pedro Gomes Coelho,-88.56778,-1.4521866,1.0,jp@gmail.com,3333,67.0
-Voluntario:v73,Rui Pedro Gomes Coelho,-45.424522,-79.517136,15.0,ruicoelho@hotmail.com,5555,45.7
-Voluntario:v69,Pedro Miguel da Silva Paiva AntÃ³nio,-3.4494247,78.96666,164.0,pedromiguel@mail.com,6666,55.2
-Voluntario:v59,JoÃ£o Carlos Delgado Monteiro,87.60193,-67.35995,56.0,jmonteiro@mail.com,7777,77.1
-Voluntario:v33,SimÃ£o Pedro Santa Cruz Oliveira,11.959328,95.35214,81.0,simaooliveira@mail.com,8888,88.1
-Transportadora:t26,TERCARGO - TRANSITÃRIOS,68.8905,-38.96917,539968772,119.0,0.5,tercargo@mail.com,10000,10.0
-Transportadora:t24,TORRESTIR TRANSITÃRIOS LDA,74.59796,12.1732025,881936632,114.0,1.5,torrestir@mail.com,11000,67.5
-Transportadora:t51,SÃBIA ATITUDE - CONSTRUÃ‡Ã•ES,-39.519154,8.964966,455159118,167.0,3.5,sabiaatitude@mail.com,11100,55.1
-Transportadora:t31,ZENITHINDEX,31.47522,76.58536,599618020,192.0,1.5,zen@mail.com,11110,5.8
-Transportadora:t9,TORRESTIR TRANSITÃRIOS LDA,-9.798416,29.869064,923953011,128.0,1.5,torres@mail.com,111112,7.8
+Voluntario:v20,JoÃ£o Pedro Gomes Coelho,-88.56778,-1.4521866,1.0,jp@gmail.com,3333,67.0,50.0,2.5
+Voluntario:v73,Rui Pedro Gomes Coelho,-45.424522,-79.517136,15.0,ruicoelho@hotmail.com,5555,45.7,70.0,4.1
+Voluntario:v69,Pedro Miguel da Silva Paiva AntÃ³nio,-3.4494247,78.96666,164.0,pedromiguel@mail.com,6666,55.2,55.0,3.5
+Voluntario:v59,JoÃ£o Carlos Delgado Monteiro,87.60193,-67.35995,56.0,jmonteiro@mail.com,7777,77.1,60.0,3.2
+Voluntario:v33,SimÃ£o Pedro Santa Cruz Oliveira,11.959328,95.35214,81.0,simaooliveira@mail.com,8888,88.1,57.0,4.2
+Transportadora:t26,TERCARGO - TRANSITÃRIOS,68.8905,-38.96917,539968772,119.0,0.5,tercargo@mail.com,10000,10.0,90.0,4.5
+Transportadora:t24,TORRESTIR TRANSITÃRIOS LDA,74.59796,12.1732025,881936632,114.0,1.5,torrestir@mail.com,11000,67.5,78.0,3.5
+Transportadora:t51,SÃBIA ATITUDE - CONSTRUÃ‡Ã•ES,-39.519154,8.964966,455159118,167.0,3.5,sabiaatitude@mail.com,11100,55.1,80.0,2.1
+Transportadora:t31,ZENITHINDEX,31.47522,76.58536,599618020,192.0,1.5,zen@mail.com,11110,5.8,67.0,3.6
+Transportadora:t9,TORRESTIR TRANSITÃRIOS LDA,-9.798416,29.869064,923953011,128.0,1.5,torres@mail.com,111112,7.8,79.0,4.8
+Transportadora:t77,AAAA,60,70,11111111,178.0,1.5,abc@mail.com,1717,100.0,69.0,4.8
+Transportadora:t78,AABB,61,71,22222222,190.0,3.0,abcd@mail.com,1818,101.0,50.0,4.9
+Transportadora:t79,ABBB,61,70,333333333,167.0,1.5,abd@mail.com,1817,102.0,79.0,4.7
+Transportadora:t80,BBBB,62,70,444444444,158.0,3.0,abbd@mail.com,1179,103.0,66.0,4.4
+Transportadora:t89,AAMM,62,72,555555555,179.0,3.1,aamm@mail.com,1010,106.0,77.0,5.0
 Loja:l29,TV e TelecomunicaÃ§Ãµes,39.627502,33.60112,aaa@mail.com,6767,1.5,4
 Loja:l58,Primark,78.73474,66.239685,primark@mail.com,4848,4.2,10
 Loja:l8,Punt Roma,57.339508,-86.066315,puntroma@mail.com,5566,3.2,3

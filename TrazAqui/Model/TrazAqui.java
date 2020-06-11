@@ -250,24 +250,8 @@ public class TrazAqui implements Serializable {
     return aux;
     }
 
-    public List<EmpresaTransportadora> empresasOrdenadasCusto(){
-        Set<EmpresaTransportadora> res = new TreeSet<>(new ComparatorTaxa());
-        for(Transporte a : this.transporte.values()){
-            if(a instanceof EmpresaTransportadora){
-                EmpresaTransportadora e = (EmpresaTransportadora) a;
-            res.add(e.clone());
-            }
-        }
 
-        return res.stream().collect(Collectors.toList());
-    }
 
-    public EmpresaTransportadora empresaMaisBarata(){
-        List<EmpresaTransportadora> emp = empresasOrdenadasCusto();
-        int n = emp.size()-1;
-        EmpresaTransportadora e = emp.get(n);
-        return e;
-    }
 
 
     public void adicionaTransportador(Transporte t) {
@@ -581,7 +565,7 @@ public class TrazAqui implements Serializable {
         for(Map.Entry<String,Integer> e: res.entrySet()){
             users.add(getUsers().get(e.getKey()));
         }
-        Collections.sort(users, Collections.reverseOrder());
+        //Collections.sort(users, Collections.reverseOrder());
         users=users.stream().limit(10).collect(Collectors.toList());
 
         return users;
@@ -787,7 +771,7 @@ public class TrazAqui implements Serializable {
 
 
     public void addEncomendaVoluntario(){
-        Encomenda e = this.getEmpresaIn().encPedidasData().get(0);
+        Encomenda e = this.getEncomenda();
         Voluntario t = getVoluntariosTransporte().get(e.getDistribuidor().getReferencia());
         t.aceitaEncomenda(e); //diz que esta ocupado numa entrega
         e.setEfetuada(true); //diz que a efetuou

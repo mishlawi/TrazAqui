@@ -48,7 +48,6 @@ public class Loja extends Ator implements Serializable {
     }
 
 
-
     public int getFila() {
         return fila;
     }

@@ -5,13 +5,18 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Classe Transporte
+ * @author grupo 115
+ */
+
 
 public class Voluntario extends Transporte implements Serializable
 {
 
 
 
-    //Construtores
+
 
     public Voluntario(){
         super();
@@ -41,15 +46,6 @@ public class Voluntario extends Transporte implements Serializable
     public Voluntario clone(){
         return new Voluntario(this);
     }
-
-
-
-    /* metodos */
-
-    public void updateLocalizacao(Point2D.Double n){
-        setMorada(n);
-    }
-
 
 
 

@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+
 import java.text.DecimalFormat;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 import static java.lang.Double.parseDouble;
 import static java.lang.Float.parseFloat;
 import static java.lang.System.exit;
+
 
 
 public class View implements Serializable {
@@ -46,7 +48,7 @@ public class View implements Serializable {
 
         String[] menuTransportador = {"Dados pessoais",
                 "Minhas Encomendas",
-                "Mostrar total faturado",
+                "Faturação",
                 "Pedidos"};
 
         String[] menuLoja = {"Dados da sua loja",
@@ -56,8 +58,7 @@ public class View implements Serializable {
                 "Pedidos"};
 
 
-        String[] mshowPreco = {"Total",
-                "Total faturado ",
+        String[] mshowPreco = {"Total faturado ",
                 "Total faturado num periodo"};
 
         String[] mescolhaC = {"Sou cliente", "Sou transportador de encomendas", "Sou voluntario", "Sou lojista"};
@@ -72,7 +73,12 @@ public class View implements Serializable {
 
     public static void main(String[] args) {
 
-        System.out.println("***********************************************************************************************\n\nÉ necessária fazer uma leitura de um dos ficheiros de logs.\n\nNOTA: Caso tenha lido um dos ficheiros, a leitura de outro levará à perda dos dados originais.\n\nCaso ja tenha lido um dos ficheiros  por favor prossiga\n1-Ler ficheiro default de logs?\n2-Ler ficheiro de logs personalizado\n3-Prosseguir\n\n***********************************************************************************************\n");
+        System.out.println("***********************************************************************************************" +
+                "\n\nÉ necessária fazer uma leitura de um dos ficheiros de logs." +
+                "\n\nNOTA: Caso tenha lido um dos ficheiros, a leitura de outro levará à perda dos dados originais." +
+                "\n\nCaso ja tenha lido um dos ficheiros  por favor prossiga\n1-Ler ficheiro default de logs?\n2-Ler ficheiro de logs personalizado" +
+                "\n3-Prosseguir" +
+                "\n\n***********************************************************************************************\n");
 
         int a = Input.lerInt();
         if (a == 1) {
@@ -253,28 +259,32 @@ public class View implements Serializable {
         System.out.println("Produtos adicionados com sucesso");
         encomenda  = dados.geraReferenciaEncomenda(encomenda);
         System.out.println("Referencia da encomenda: " + encomenda.getReferencia());
-        dados.setEnc(encomenda); //é a encomenda a ser tratada no traz aqui
-        dados.addRegistoC(); //adiciona a encomenda ao registo do cliente LOGADO
-        dados.addRegistoL(); //adiciona a encomenda aos registos da loja
+        dados.setEnc(encomenda);
+        dados.addRegistoC();
+        dados.addRegistoL();
         Transporte transportador;
-        transportador = dados.sortEncomendaTransporte(encomenda); //transportador mais proximo
+        transportador = dados.sortEncomendaTransporte(encomenda);
         System.out.println("Foi enviado um pedido para o transportador:" + transportador.getNome() + " " + transportador.getReferencia());
-        dados.adicionaEncomenda(encomenda); //adiciona ao registo geral de encomendas
+        dados.adicionaEncomenda(encomenda);
         dados.addRegistoPedidoTransportador(transportador);
 
 
-
         if(transportador instanceof Voluntario) {
+
             dados.setEnc(encomenda);
-            Voluntario e = (Voluntario) encomenda.getDistribuidor();
+
+            String refv = transportador.getReferencia();
+            Voluntario e = dados.getVoluntariosTransporte().get(refv);
             encomenda.setAceiteCliente(true);
             encomenda.setDistribuidor(e);
+            dados.setEnc(encomenda);
             e.setDisponibilidade(false);
+            e.setMorada(encomenda.getDistribuidor().getMorada());
+
             dados.addEncomendaVoluntario();
             System.out.println("A sua encomenda encontra-se a caminho....\n\n\n\n\n");
             System.out.println("Viagem concluida. O seu pedido foi realizado com sucesso" + "\nDuração da viagem: " + encomenda.getTempo()
                     + "\nClassificação a atribuir ao seu voluntario (0-5): ");
-
 
             int y = Input.lerInt();
             e.setClassificacao(y);
@@ -305,7 +315,7 @@ public class View implements Serializable {
                 System.out.println("Indique a referencia da encomenda a aceitar");
                 ref = Input.lerString();
                 Encomenda e = dados.getEmpresaIn().getEncomendas().get(ref);
-                System.out.println(e.toStringNavpreco());
+                System.out.println(e.toStringNav());
                 e.setDistribuidor(dados.getEmpresaIn());
                 e.setCustoTransporte(dados.getEmpresaIn().defineCusto(e));
                 e.setAceiteTransportador(true);
@@ -360,9 +370,10 @@ public class View implements Serializable {
                 encomenda.setAceiteCliente(true);
                 encomenda.setDistribuidor(e);
                 e.setDisponibilidade(false);
+                dados.setEnc(encomenda);
                 dados.addEncomendaEmpresa();
                 Double custo = encomenda.getCustoProdutos() + encomenda.getCustoTransporte();
-                System.out.println("A sua encomenda encontra-se a caminho....\n\n\n\n\n");
+                System.out.println("A sua encomenda encontra-se a caminho...\n\n\n\n\n");
                 System.out.println("Viagem concluida. O seu pedido foi realizado com sucesso" + "\nDuração da viagem: " + encomenda.getTempo()  + "Custo total do seu pedido: " + custo
                          + "\nClassificação a atribuir ao seu transportador (0-5): ");
                 System.out.println("Transportador ficou com um total de " + e.getNumeroKms() + "kms percorridos");
@@ -403,9 +414,6 @@ public class View implements Serializable {
 
 
     }
-
-
-
 
     public static void showencguer(int x) {
         LocalDate data, data2;
@@ -487,7 +495,7 @@ public class View implements Serializable {
                     showdadosV();
                     break;
                 case 2:
-
+                    showencguer(3);
                     break;
 
                 default:
@@ -500,7 +508,6 @@ public class View implements Serializable {
 
 
     public static void perfilLoja() {
-
         do {
             loja.executa();
 
@@ -863,7 +870,7 @@ public class View implements Serializable {
         Iterator<User> it = top.iterator();
         while (it.hasNext()) {
             User c = it.next();
-            System.out.println("Pos" + i + c.getNome() + "" + c.getNif());
+            System.out.println("Pos " + i + c.getNome() + " " + c.getReferencia() + "total encomendas: " + c.getEncomendas().size());
             i++;
         }
 
@@ -1001,6 +1008,7 @@ public class View implements Serializable {
             p.setMorada(coordenadastransporte);
             p.setRaio(Float.parseFloat(tokens.get(6)));
             p.setTaxa(Double.parseDouble(tokens.get(7)));
+
 
 
 
@@ -1165,6 +1173,9 @@ public class View implements Serializable {
             p.setEmail(tokens.get(8));
             p.setPassword(tokens.get(9));
             p.setNumeroKms(parseDouble(tokens.get(10)));
+            p.setVelocidadeMedia(parseDouble(tokens.get(11)));
+            p.setClassificacao(parseDouble(tokens.get(12)));
+
 
 
             // System.out.println(p);
@@ -1188,6 +1199,8 @@ public class View implements Serializable {
             v.setEmail(tokens.get(5));
             v.setPassword(tokens.get(6));
             v.setNumeroKms(parseDouble(tokens.get(7)));
+            v.setVelocidadeMedia(parseDouble(tokens.get(8)));
+            v.setClassificacao(parseDouble(tokens.get(9)));
 
             try {
                 dados.registarVoluntario(v);

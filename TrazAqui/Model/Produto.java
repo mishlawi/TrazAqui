@@ -4,6 +4,12 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 
 
+/**
+ * Classe Produto
+ * @author grupo 115
+ */
+
+
 public class Produto implements Serializable {
 
     private String referencia;
