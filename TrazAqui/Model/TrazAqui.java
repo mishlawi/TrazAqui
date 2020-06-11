@@ -24,7 +24,6 @@ public class TrazAqui implements Serializable {
     private Voluntario voluntarioIn;
     private EmpresaTransportadora empresaIn;
     private Loja lojaIn;
-
     private Encomenda encomenda;
 
 
@@ -472,7 +471,7 @@ public class TrazAqui implements Serializable {
     }
 
     public double totalFaturadoPeriodo(String referencia, LocalDate data){
-        List<Encomenda> a = encGlobaisData().stream().filter(e->e.getDistribuidor().getReferencia().equals(referencia)).filter(e->e.getData().toLocalDate().isBefore(data)).sorted(new DataComparator()).collect(Collectors.toList());
+        List<Encomenda> a = this.encomendas.values().stream().filter(e->e.getDistribuidor().getReferencia().equals(referencia) && e.getData().toLocalDate().isBefore(data)).collect(Collectors.toList());
         double res=0;
         for(Encomenda e : a){
             res+=e.getCustoTransporte();
@@ -481,74 +480,22 @@ public class TrazAqui implements Serializable {
     }
 
 
-
-
-    public Map<LocalDate,List<Encomenda>> encPorDatas(Map<String,Encomenda> aux ){
-//
-        Map<LocalDate,List<Encomenda>> time = new HashMap<>();
-
-        for(Map.Entry<String,Encomenda> e: aux.entrySet()){
-            if(time.containsKey(e.getValue().getData().toLocalDate())){
-                List<Encomenda> a = new ArrayList<>();
-                a = time.get(e.getValue().getData().toLocalDate());
-                a.add(e.getValue().clone());
-                time.put(e.getValue().getData().toLocalDate(),a);
-            }
-            else{
-                List<Encomenda> a = new ArrayList<>();
-                a.add(e.getValue().clone());
-                time.put(e.getValue().getData().toLocalDate(),a);
-            }
-        }
-        return time;
+    public List<Encomenda> showEncomendasEmpresa(LocalDate data) {
+        return this.encomendas.values().stream().filter(e -> e.getData().toLocalDate().isBefore(data) && e.getDistribuidor().getReferencia().equals(this.empresaIn.getReferencia())).sorted(new DataComparator()).collect(Collectors.toList());
     }
 
-
-
-//mostra a lista de encomendas num dado periodo
-    public void showEncomenda(LocalDate data, LocalDate data2, int x) {
-        List<Encomenda> res = new ArrayList<>();
-        if (x == 1) {
-            for (Map.Entry<LocalDate, List<Encomenda>> entry : this.encPorDatas(getClienteIn().getEncomendas()).entrySet()) {
-                if (entry.getKey().equals(data) || entry.getKey().equals(data2) || entry.getKey().isAfter(data) || entry.getKey().isBefore(data2)) {
-                    Iterator<Encomenda> it = entry.getValue().iterator();
-                    while (it.hasNext()) {
-                        Encomenda l = it.next();
-                        res.add(l.clone());
-                        System.out.println(l.toString());
-                    }
-
-                }
-
-            }
-        }
-        if (x == 2)
-            for (Map.Entry<LocalDate, List<Encomenda>> entry : this.encPorDatas(getEmpresaIn().getEncomendas()).entrySet()) {
-                if (entry.getKey().equals(data) || entry.getKey().equals(data2) || entry.getKey().isAfter(data) || entry.getKey().isBefore(data2)) {
-                    Iterator<Encomenda> it = entry.getValue().iterator();
-                    while (it.hasNext()) {
-                        Encomenda l = it.next();
-                        res.add(l.clone());
-                        System.out.println(l.toString());
-                    }
-
-                }
-            }
-        else {
-            for (Map.Entry<LocalDate, List<Encomenda>> entry : this.encPorDatas(getVoluntarioIn().getEncomendas()).entrySet()) {
-                if (entry.getKey().equals(data) || entry.getKey().equals(data2) || entry.getKey().isAfter(data) || entry.getKey().isBefore(data2)) {
-                    Iterator<Encomenda> it = entry.getValue().iterator();
-                    while (it.hasNext()) {
-                        Encomenda l = it.next();
-                        res.add(l.clone());
-                        System.out.println(l.toString());
-                    }
-
-                }
-            }
-
-        }
+    public List<Encomenda> showEncomendasVoluntario(LocalDate data) {
+        return this.encomendas.values().stream().filter(e -> e.getData().toLocalDate().isBefore(data) && e.getDistribuidor().getReferencia().equals(this.voluntarioIn.getReferencia())).sorted(new DataComparator()).collect(Collectors.toList());
     }
+
+    public List<Encomenda> showEncomendaLoja(LocalDate data) {
+        return this.encomendas.values().stream().filter(e -> e.getData().toLocalDate().isBefore(data) && e.getLoja().getReferencia().equals(this.lojaIn.getReferencia())).collect(Collectors.toList());
+    }
+
+    public List<Encomenda> showEncomendaUser(LocalDate data) {
+        return this.encomendas.values().stream().filter(e -> e.getData().toLocalDate().isBefore(data) && e.getComprador().getReferencia().equals(this.userIn.getReferencia())).collect(Collectors.toList());
+    }
+
 
     public List<EmpresaTransportadora> top10Kms(){
         return getEmpresaTransporte().values().stream()
@@ -566,45 +513,14 @@ public class TrazAqui implements Serializable {
 
     /*basicamente retira todos os pedidos existentes para esta loja */
 
-    public List<Encomenda> getPedidos(){
+    public List<Encomenda> getPedidosLoja(){
+
         Map<String,Encomenda> aux = this.getEncomendas();
-        List <Encomenda> res = new ArrayList<>();
-        for(Map.Entry<String,Encomenda> e: aux.entrySet()){
-            if(e.getValue().getLoja().equals(this.getLojaIn().getReferencia()))
-                res.add(e.getValue().clone());
-        }
+        List <Encomenda> res = aux.values().stream().filter(e->!e.isEfetuada() || !e.isAceiteTransportador() || !e.isAceiteCliente() && e.getLoja().getReferencia().equals(this.lojaIn.getReferencia())).collect(Collectors.toList());
         return res;
     }
 
 
-
-    //filtra as empresas disponiveis e que conseguem fazer a entrega nas moradas da encomenda
-    public Map<String, EmpresaTransportadora> EncomendaEmpresas(Encomenda a) {
-        Map<String, EmpresaTransportadora> aux = new HashMap<>();
-        for (Map.Entry<String, Transporte> e : getTransportador().entrySet()) {
-            if (e.getValue() instanceof EmpresaTransportadora) {
-                EmpresaTransportadora ep = (EmpresaTransportadora) e.getValue();
-                if (ep.isDisponivel() && ep.distanciaValida(a)) aux.put(e.getKey(), ep.clone());
-            }
-        }
-
-        return aux;
-    }
-
-
-    //filtra os voluntarios disponiveis e que conseguem fazer a entrega nas moradas da encomenda
-    private Map<String, Transporte> EncomendaVoluntarios(Encomenda a) {
-        Map<String, Transporte> aux = new HashMap<>();
-
-        for (Map.Entry<String, Transporte> e : getTransportador().entrySet()) {
-            if (e.getValue() instanceof Voluntario) {
-                Transporte ep = e.getValue();
-                if (ep.isDisponivel() && ep.distanciaValida(a)) aux.put(e.getKey(), ep.clone());
-            }
-        }
-
-        return aux;
-    }
 
     //filtra os transportadores disponiveis e que conseguem fazer a entrega nas moradas da encomenda
     private Map<String, Transporte> EncomendaTransporte(Encomenda a) {
@@ -663,21 +579,6 @@ public class TrazAqui implements Serializable {
     }
 
 
-
-    public Transporte sortEncomendaVoluntario(Encomenda a) {
-
-        Map<String, Transporte> map1 = EncomendaVoluntarios(a);
-        String aux = "";
-        double distancia = 0;
-
-        for (Map.Entry<String, Transporte> e : map1.entrySet()) {
-            if (e.getValue().distancia(this.getEncomenda().clone()) > distancia) {
-                distancia = e.getValue().distancia(a);
-                aux = e.getKey();
-            }
-        }
-        return map1.get(aux);
-    }
 
 
 
@@ -827,7 +728,7 @@ public class TrazAqui implements Serializable {
 Carregamento de dados
  **/
     public static TrazAqui lerDados() throws IOException, ClassNotFoundException{
-        //System.out.println("Working Directory = " + System.getProperty("user.dir"));
+
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream("TrazAqui.data"));
         TrazAqui db = (TrazAqui) ois.readObject();
         ois.close();

@@ -262,12 +262,12 @@ public class Encomenda implements Serializable
     }
 
     public String toStringNav() {
-        return  "Cliente: " + this.getComprador().getNome() +
+        return  "**"+ "Cliente: " + this.getComprador().getNome() +
                 " Loja: " + this.getLoja().getNome() +
-                " Referencia da encomenda " + referencia + '\'' +
-                " Peso" + peso +
-                " kg \t| Pedido feito em " + this.getData().toLocalDate()
-                + " às " + this.getData().toLocalTime()
+                " Referencia da encomenda " + referencia +
+                " Peso " + peso +
+                " kg| Pedido feito em " + this.getData().toLocalDate()
+                + " às " + this.getData().toLocalTime()+"\n"
                 ;
     }
 

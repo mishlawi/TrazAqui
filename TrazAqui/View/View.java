@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import static java.lang.Double.parseDouble;
 import static java.lang.Float.parseFloat;
 import static java.lang.System.exit;
-
+import static java.lang.System.setOut;
 
 
 public class View implements Serializable {
@@ -33,7 +33,7 @@ public class View implements Serializable {
     }
 
     private static TrazAqui dados = new TrazAqui();
-    private static Menu principal, cliente, transportador, loja, escolhaC, showPreco;
+    private static Menu principal, cliente, transportador, loja, escolhaC, showPreco,voluntario;
 
     private static void carregaMenus() {
         String[] menuPrincipal = {"Registar",
@@ -50,7 +50,13 @@ public class View implements Serializable {
         String[] menuTransportador = {"Dados pessoais",
                 "Minhas Encomendas",
                 "Faturação",
-                "Pedidos"};
+                "Pedidos",
+                "Estado de trabalho"};
+
+        String[] menuVoluntario = {"Dados pessoais",
+                                "Minhas Encomendas",
+                                "Estado de trabalho"
+        };
 
         String[] menuLoja = {"Dados da sua loja",
                 "Listagem de encomendas",
@@ -70,6 +76,7 @@ public class View implements Serializable {
         loja = new Menu(menuLoja);
         escolhaC = new Menu(mescolhaC);
         showPreco = new Menu(mshowPreco);
+        voluntario = new Menu(menuVoluntario);
     }
 
     public static void main(String[] args) {
@@ -202,7 +209,131 @@ public class View implements Serializable {
 
     }
 
+    public static void perfilCliente() throws ProdutosException {
 
+        do {
+            cliente.executa();
+
+
+            switch (cliente.getOp()) {
+                case 0:
+                    break;
+                case 1:
+                    showdadosC();
+                    break;
+                case 2:
+                    encomendar();
+                    break;
+                case 3:
+                    pedidos();
+                    break;
+                case 4:
+                    showencguer(2);
+                    break;
+
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        } while (cliente.getOp() != 0);
+
+    }
+    public static void perfilEmpresa() {
+
+
+        do {
+            transportador.executa();
+
+
+            switch (transportador.getOp()) {
+                case 0:
+                    break;
+                case 1:
+                    showdadosE();
+                    break;
+                case 2:
+                    showencguer(1);
+                    break;
+                case 3:
+                    showPreco();
+                    break;
+                case 4:
+                    pedidosEmpresa();
+                    break;
+                case 5:
+                    estadoE();
+                    break;
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        } while (transportador.getOp() != 0);
+
+    }
+
+    public static void perfilVoluntario() {
+
+
+        do {
+            voluntario.executa();
+
+
+            switch (voluntario.getOp()) {
+                case 0:
+                    break;
+                case 1:
+                    showdadosV();
+                    break;
+                case 2:
+                    showencguer(4);
+                    break;
+                case 3:
+                    estadoV();
+                    break;
+
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        } while (voluntario.getOp() != 0);
+
+    }
+
+
+
+    public static void perfilLoja() {
+        do {
+            loja.executa();
+
+
+            switch (loja.getOp()) {
+                case 0:
+                    break;
+                case 1:
+                    showdadosL();
+                    break;
+                case 2:
+                    showencguer(3);
+                    break;
+                case 3:
+                    produtosDisponiveis();
+                    break;
+                case 4:
+                    insereProdutos();
+                    break;
+                case 5:
+                    status();
+                    break;
+
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        } while (transportador.getOp() != 0);
+
+    }
+
+    public static void status(){
+        List<String> list = dados.getPedidosLoja().stream().map(Encomenda::toStringNav).collect(Collectors.toList());
+        Navegador a = new Navegador(list,10,1);
+        a.run();
+    }
 
     public static void encomendar() throws ProdutosException {
 
@@ -416,129 +547,39 @@ public class View implements Serializable {
     }
 
     public static void showencguer(int x) {
-        LocalDate data, data2;
-        String date, date2;
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
-        System.out.println("Insira o intervalo de datas 1º:(d/mm/yyyy) ");
+        LocalDate data;
+        String date;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        System.out.println("Insira a data limite:(dd/mm/yyyy) ");
         date = Input.lerString();
         data = LocalDate.parse(date, formatter);
-        System.out.println("2º:(d/m/yyyy) ");
-        date2 = Input.lerString();
-        data2 = LocalDate.parse(date2, formatter);
-        dados.showEncomenda(data, data2, x);
+        if(x==1) {
+            List<String> a=dados.showEncomendasEmpresa(data).stream().map(Encomenda::toStringNav).collect(Collectors.toList());
 
-    }
+            Navegador n1 = new Navegador(a,10,1);
+            n1.run();
+        }
+        if(x==2){
+            List<String> a=dados.showEncomendaUser(data).stream().map(Encomenda::toStringNav).collect(Collectors.toList());
+            Navegador n1 = new Navegador(a,10,1);
+            n1.run();
 
-    public static void perfilCliente() throws ProdutosException {
+        }
 
-        do {
-            cliente.executa();
+        if(x==3){
+            List<String> a=dados.showEncomendaLoja(data).stream().map(Encomenda::toStringNav).collect(Collectors.toList());
+            Navegador n1 = new Navegador(a,10,1);
+            n1.run();
 
-
-            switch (cliente.getOp()) {
-                case 0:
-                    break;
-                case 1:
-                    showdadosC();
-                    break;
-                case 2:
-                    encomendar();
-                    break;
-                case 3:
-                    pedidos();
-                    break;
-                case 4:
-                    showencguer(1);
-                    break;
-
-                default:
-                    System.out.println("Opção inválida.");
-            }
-        } while (cliente.getOp() != 0);
-
-    }
-    public static void perfilEmpresa() {
-
-
-        do {
-            transportador.executa();
-
-
-            switch (transportador.getOp()) {
-                case 0:
-                    break;
-                case 1:
-                    showdadosE();
-                    break;
-                case 2:
-                    showencguer(2);
-                    break;
-                case 3:
-                    showPreco();
-                    break;
-                case 4:
-                    pedidosEmpresa();
-                    break;
-                default:
-                    System.out.println("Opção inválida.");
-            }
-        } while (transportador.getOp() != 0);
-
-    }
-
-    public static void perfilVoluntario() {
-
-
-        do {
-            transportador.executa();
-
-
-            switch (transportador.getOp()) {
-                case 0:
-                    break;
-                case 1:
-                    showdadosV();
-                    break;
-                case 2:
-                    showencguer(3);
-                    break;
-
-                default:
-                    System.out.println("Opção inválida.");
-            }
-        } while (transportador.getOp() != 0);
-
+        }
+        if(x==4){
+            List<String> a=dados.showEncomendasVoluntario(data).stream().map(Encomenda::toStringNav).collect(Collectors.toList());
+            Navegador n1 = new Navegador(a,10,1);
+            n1.run();
+        }
     }
 
 
-
-    public static void perfilLoja() {
-        do {
-            loja.executa();
-
-
-            switch (loja.getOp()) {
-                case 0:
-                    break;
-                case 1:
-                    showdadosL();
-                    break;
-                case 2:
-                    showEncomendas();
-                    break;
-                case 3:
-                    produtosDisponiveis();
-                    break;
-                case 4:
-                    insereProdutos();
-
-                default:
-                    System.out.println("Opção inválida.");
-            }
-        } while (transportador.getOp() != 0);
-
-    }
 
     public static void insereProdutos() {
         Loja l = dados.ShowDadosL();
@@ -549,29 +590,24 @@ public class View implements Serializable {
         double preco = Input.lerDouble();
         System.out.println("Peso do produto");
         float peso = Input.lerFloat();
-        String aws = "";
 
         p.setNome(nome);
         p.setPreco(preco);
         p.setPeso(peso);
-
         p = dados.geraReferenciaProduto(p,dados.getLojaIn());
-        System.out.println("Produto adicionado com sucesso com a referenica " + p.getReferencia());
+        System.out.println("Produto adicionado com sucesso com a referencia " + p.getReferencia());
+        Loja j = dados.getLojaIn();
+        j.adicionaProdutoLoja(p);
+        dados.adicionaLoja(l);
     }
 
     public static void produtosDisponiveis(){
         System.out.println("Lista de produtos disponiveis para venda:\n");
-        List<String> a = dados.getLojaIn().getProdutos().values().stream().map(e->e.navString()).collect(Collectors.toList());
+        List<String> a = dados.getLojaIn().getProdutos().values().stream().map(Produto::navString).collect(Collectors.toList());
         Navegador n1 = new Navegador(a, 1, 5);
         n1.run();
     }
 
-    public static void showEncomendas(){
-        Loja  l = dados.getLojaIn();
-        List <String> enc = dados.getEncomendas().values().stream().filter(e->e.getLoja().getReferencia().equals(l.getReferencia()) && e.isEfetuada()).map(Encomenda::toStringNav).collect(Collectors.toList());
-        Navegador nav = new Navegador(enc,1, 7);
-        nav.run();
-    }
 
     public static void showPreco() {
 
@@ -606,10 +642,9 @@ public class View implements Serializable {
         LocalDate data;
         String date;
 
-
         email = dados.getEmpresaIn().getReferencia();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
-        System.out.println("Insira a limite faturação :(d/mm/yyyy) ");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        System.out.println("Insira a limite faturação :(dd/mm/yyyy) ");
         date = Input.lerString();
         data = LocalDate.parse(date, formatter);
         System.out.println("Total faturado nesse periodo:" + dados.totalFaturadoPeriodo(email, data));
@@ -655,6 +690,64 @@ public class View implements Serializable {
         System.out.println("Numero de encomendas em que esteve envolvido:"+ l.getEncomendas().size());
         System.out.println("_______________________________________________");
     }
+
+    public static void estadoV() {
+        if (dados.getVoluntarioIn().isDisponivel()) {
+            System.out.println("Deseja não estar ativo para entregas?\n (1)->Sim (2)-> Não");
+            int op = Input.lerInt();
+            if (op == 1) {
+                Voluntario v = dados.getVoluntarioIn();
+                v.setDisponibilidade(false);
+                dados.adicionaTransportador(v);
+            }
+            if (op == 2) {
+
+            }
+        }
+        if (!dados.getVoluntarioIn().isDisponivel()) {
+            System.out.println("Deseja estar ativo para entregas?\n (1)->Sim (2)-> Não");
+            int op = Input.lerInt();
+            if (op == 1) {
+                Voluntario v = dados.getVoluntarioIn();
+                v.setDisponibilidade(true);
+                dados.adicionaTransportador(v);
+            }
+            if (op == 2) {
+
+            }
+
+        }
+    }
+
+    public static void estadoE() {
+        if (dados.getEmpresaIn().isDisponivel()) {
+            System.out.println("Deseja não estar ativo para entregas?\n (1)->Sim (2)-> Não");
+            int op = Input.lerInt();
+            if (op == 1) {
+                EmpresaTransportadora v = dados.getEmpresaIn();
+                v.setDisponibilidade(false);
+                dados.adicionaTransportador(v);
+            }
+            if (op == 2) {
+
+            }
+        }
+        else{
+            System.out.println("Deseja estar ativo para entregas?\n (1)->Sim (2)-> Não");
+            int op = Input.lerInt();
+            if (op == 1) {
+                EmpresaTransportadora v = dados.getEmpresaIn();
+                v.setDisponibilidade(true);
+                dados.adicionaTransportador(v);
+            }
+            if (op == 2) {
+
+            }
+
+        }
+    }
+
+
 
     public static void registar() {
         String email, nome, password;
@@ -1080,13 +1173,13 @@ public class View implements Serializable {
             dados.adicionaEncomenda(enc);
 
 
-            //atualizar encomendas nos users
+
             User e = dados.getUsers().get(tokens.get(2));
             e.adicionaEncomendaUser(enc);
             dados.adicionaUser(e);
 
 
-            //atualizar encomenda nas loja
+
             Loja j = dados.getLojas().get(tokens.get(3));
             j.adicionaEncomendaLoja(enc);
             dados.adicionaLoja(j);
@@ -1280,6 +1373,7 @@ public class View implements Serializable {
         } else if (tokens.get(0).equals("Aceite")) {
 
             Encomenda e = dados.getEncomendas().get(tokens.get(1));
+            e.setDistribuidor(dados.getTransportador().get(tokens.get(2)));
             e.setEfetuada(true);
             dados.adicionaEncomenda(e);
             System.out.println("Encomendas efetuadas lidas");
