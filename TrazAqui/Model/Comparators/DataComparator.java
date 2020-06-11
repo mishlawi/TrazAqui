@@ -1,4 +1,6 @@
-package Model;
+package Model.Comparators;
+
+import Model.Encomenda;
 
 import java.io.Serializable;
 import java.util.Comparator;

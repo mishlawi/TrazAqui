@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class User extends Ator implements Serializable {
+public class User extends Ator implements Serializable,Comparable<User>{
 private Map<String,Encomenda> encomendas;
 
     /**
@@ -77,15 +77,11 @@ private Map<String,Encomenda> encomendas;
     }
 
 
-
-/*
-
-    public boolean aceitaEntrega(Servico s, String referencia){
+    @Override
+    public int compareTo(User a) {
+        if(this.encomendas.size()>(a.getEncomendas().size())) return 1;
+        if(this.encomendas.size()<(a.getEncomendas().size())) return -1;
+        else return 0;
 
     }
-
-*/
-
-
-
 }

@@ -1,12 +1,14 @@
 package Model;
 
+import Model.Comparators.DataComparator;
+import Model.Comparators.KmComparator;
+import Model.Exeptions.LoginErradoException;
+import Model.Exeptions.MailRegistadoException;
+
 import java.io.*;
 
 
-import java.lang.reflect.Array;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -555,20 +557,11 @@ public class TrazAqui implements Serializable {
     }
 
     public List<User> topUsers(){
-    Map<String,List<Encomenda>> aux = getUtilizadorEncomendas();
-    List<User> users = new ArrayList<>();
-        Map<String,Integer>res= new HashMap<>();
-        for(Map.Entry<String,List<Encomenda>> e: aux.entrySet()) {
-            res.put(e.getKey(),e.getValue().size());
+        List<User> users = this.users.values().stream().collect(Collectors.toList());
+        Collections.sort(users, Collections.reverseOrder());
+        return users.stream().limit(10).collect(Collectors.toList());
 
-        }
-        for(Map.Entry<String,Integer> e: res.entrySet()){
-            users.add(getUsers().get(e.getKey()));
-        }
-        //Collections.sort(users, Collections.reverseOrder());
-        users=users.stream().limit(10).collect(Collectors.toList());
 
-        return users;
         }
 
     /*basicamente retira todos os pedidos existentes para esta loja */

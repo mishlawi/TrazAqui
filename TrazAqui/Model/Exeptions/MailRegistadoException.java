@@ -1,4 +1,4 @@
-package Model;
+package Model.Exeptions;
 
 import java.io.Serializable;
 public class MailRegistadoException extends Exception implements Serializable{

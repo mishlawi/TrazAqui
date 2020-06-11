@@ -283,7 +283,8 @@ public class View implements Serializable {
 
             dados.addEncomendaVoluntario();
             System.out.println("A sua encomenda encontra-se a caminho....\n\n\n\n\n");
-            System.out.println("Viagem concluida. O seu pedido foi realizado com sucesso" + "\nDuração da viagem: " + encomenda.getTempo()
+
+            System.out.println("Viagem concluida. O seu pedido foi realizado com sucesso" + "\nDuração da viagem: " + df.format(encomenda.getTempo()) + " mins"
                     + "\nClassificação a atribuir ao seu voluntario (0-5): ");
 
             int y = Input.lerInt();
@@ -870,7 +871,7 @@ public class View implements Serializable {
         Iterator<User> it = top.iterator();
         while (it.hasNext()) {
             User c = it.next();
-            System.out.println("Pos " + i + c.getNome() + " " + c.getReferencia() + "total encomendas: " + c.getEncomendas().size());
+            System.out.println("Pos " + i + " " + c.getNome() + " " + c.getReferencia() + "| Total encomendas: " + c.getEncomendas().size());
             i++;
         }
 
@@ -885,9 +886,10 @@ public class View implements Serializable {
         Iterator<EmpresaTransportadora> it = top.iterator();
         while (it.hasNext()) {
             EmpresaTransportadora c = it.next();
-            System.out.println("Pos:" + " " + i + " " + c.getNome() + " " + c.getNumeroKms());
+            System.out.println("Pos:" + " " + i + " " + c.getNome() + " " + c.getNumeroKms() + "kms");
             i++;
         }
+        System.out.println("\n");
     }
 
 
@@ -1196,11 +1198,11 @@ public class View implements Serializable {
             Point2D.Double coordenadasvoluntario = new Point2D.Double();
             coordenadasvoluntario.setLocation(x,y);
             v.setMorada(coordenadasvoluntario);
-            v.setEmail(tokens.get(5));
-            v.setPassword(tokens.get(6));
-            v.setNumeroKms(parseDouble(tokens.get(7)));
-            v.setVelocidadeMedia(parseDouble(tokens.get(8)));
-            v.setClassificacao(parseDouble(tokens.get(9)));
+            v.setEmail(tokens.get(6));
+            v.setPassword(tokens.get(7));
+            v.setNumeroKms(parseDouble(tokens.get(8)));
+            v.setVelocidadeMedia(parseDouble(tokens.get(9)));
+            v.setClassificacao(parseDouble(tokens.get(10)));
 
             try {
                 dados.registarVoluntario(v);
