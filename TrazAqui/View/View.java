@@ -1,6 +1,7 @@
 package View;
 
 import Model.*;
+import Model.Exeptions.ProdutosException;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -372,18 +373,16 @@ public class View implements Serializable {
                 encomenda.setDistribuidor(e);
                 e.setDisponibilidade(false);
                 dados.setEnc(encomenda);
-                dados.addEncomendaEmpresa();
+                e = dados.addEncomendaEmpresa();
                 Double custo = encomenda.getCustoProdutos() + encomenda.getCustoTransporte();
+                DecimalFormat df = new DecimalFormat("####0.00");
                 System.out.println("A sua encomenda encontra-se a caminho...\n\n\n\n\n");
-                System.out.println("Viagem concluida. O seu pedido foi realizado com sucesso" + "\nDuração da viagem: " + encomenda.getTempo()  + "Custo total do seu pedido: " + custo
+                System.out.println("Transportador ficou com um total de " + df.format(e.getNumeroKms()) + " kms percorridos");
+                System.out.println("Viagem concluida. O seu pedido foi realizado com sucesso" + "\nDuração da viagem: " + df.format(encomenda.getTempo())  + "mins\nCusto total do seu pedido: " + df.format(custo)
                          + "\nClassificação a atribuir ao seu transportador (0-5): ");
-                System.out.println("Transportador ficou com um total de " + e.getNumeroKms() + "kms percorridos");
-
-                double y=0;
-
-                y = Input.lerInt();
+                double y = Input.lerInt();
                 e.setClassificacao(y);
-                System.out.println(e.getClassificacao());
+                System.out.println("Voluntario ficou com classificação de: "+e.getClassificacao());
                 e.setDisponibilidade(true);
                 dados.addRegistoL();
                 dados.addRegistoC();
@@ -438,6 +437,8 @@ public class View implements Serializable {
 
 
             switch (cliente.getOp()) {
+                case 0:
+                    break;
                 case 1:
                     showdadosC();
                     break;
@@ -465,6 +466,8 @@ public class View implements Serializable {
 
 
             switch (transportador.getOp()) {
+                case 0:
+                    break;
                 case 1:
                     showdadosE();
                     break;
@@ -492,6 +495,8 @@ public class View implements Serializable {
 
 
             switch (transportador.getOp()) {
+                case 0:
+                    break;
                 case 1:
                     showdadosV();
                     break;
@@ -514,15 +519,19 @@ public class View implements Serializable {
 
 
             switch (loja.getOp()) {
+                case 0:
+                    break;
                 case 1:
                     showdadosL();
                     break;
                 case 2:
-                    insereProdutos();
+                    showEncomendas();
                     break;
                 case 3:
                     produtosDisponiveis();
                     break;
+                case 4:
+                    insereProdutos();
 
                 default:
                     System.out.println("Opção inválida.");
@@ -541,30 +550,27 @@ public class View implements Serializable {
         System.out.println("Peso do produto");
         float peso = Input.lerFloat();
         String aws = "";
-        while (!aws.equals("S") || !aws.equals("N")){
-            System.out.println("É medicinal? (S/N)");
-        aws = Input.lerString();
-    }
+
         p.setNome(nome);
         p.setPreco(preco);
         p.setPeso(peso);
 
-
-        if (aws.equals("S")){
-          p.setMedicinal(true);
-        }
-        if (aws.equals("N")){
-            p.setMedicinal(false);
-        }
         p = dados.geraReferenciaProduto(p,dados.getLojaIn());
         System.out.println("Produto adicionado com sucesso com a referenica " + p.getReferencia());
     }
 
     public static void produtosDisponiveis(){
         System.out.println("Lista de produtos disponiveis para venda:\n");
-        List a = dados.getLojaIn().getProdutos().values().stream().collect(Collectors.toList());
+        List<String> a = dados.getLojaIn().getProdutos().values().stream().map(e->e.navString()).collect(Collectors.toList());
         Navegador n1 = new Navegador(a, 1, 5);
         n1.run();
+    }
+
+    public static void showEncomendas(){
+        Loja  l = dados.getLojaIn();
+        List <String> enc = dados.getEncomendas().values().stream().filter(e->e.getLoja().getReferencia().equals(l.getReferencia()) && e.isEfetuada()).map(Encomenda::toStringNav).collect(Collectors.toList());
+        Navegador nav = new Navegador(enc,1, 7);
+        nav.run();
     }
 
     public static void showPreco() {
@@ -573,6 +579,8 @@ public class View implements Serializable {
             showPreco.executa();
 
             switch (showPreco.getOp()) {
+                case 0 :
+                    break;
                 case 1:
                     totalFaturadoEmpresa();
                     break;
@@ -598,10 +606,10 @@ public class View implements Serializable {
         LocalDate data;
         String date;
 
-        System.out.println("Insira a referencia : ");
-        email = Input.lerString();
+
+        email = dados.getEmpresaIn().getReferencia();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
-        System.out.println("Insira a data:(d/mm/yyyy) ");
+        System.out.println("Insira a limite faturação :(d/mm/yyyy) ");
         date = Input.lerString();
         data = LocalDate.parse(date, formatter);
         System.out.println("Total faturado nesse periodo:" + dados.totalFaturadoPeriodo(email, data));
@@ -624,6 +632,7 @@ public class View implements Serializable {
         System.out.println("Referencia:" + e.getReferencia());
         System.out.println("Numero de encomendas em que esteve envolvido:"+ e.getEncomendas().size());
         System.out.println("Numero de kms percorridos: " + e.getNumeroKms());
+        System.out.println("Classificação média: " + e.getClassificacao());
         System.out.println("Total faturado: " + e.getTotalFaturado());
         System.out.println("_______________________________________________");
     }
@@ -821,7 +830,7 @@ public class View implements Serializable {
             try {
                 dados.iniciaSessaoV(email, pass);
                 System.out.println("Sessão iniciada com sucesso");
-                perfilEmpresa();
+                perfilVoluntario();
             } catch (Exception e) {
                 System.out.println(e);
             }
@@ -845,6 +854,8 @@ public class View implements Serializable {
             escolhaC.executa();
 
             switch (escolhaC.getOp()) {
+                case 0:
+                    break;
                 case 1:
                     iniciaSessaoAux(1);
                     break;
@@ -1177,6 +1188,7 @@ public class View implements Serializable {
             p.setNumeroKms(parseDouble(tokens.get(10)));
             p.setVelocidadeMedia(parseDouble(tokens.get(11)));
             p.setClassificacao(parseDouble(tokens.get(12)));
+            p.setTotalFaturado(parseDouble(tokens.get(13)));
 
 
 
@@ -1219,10 +1231,14 @@ public class View implements Serializable {
             enc.setComprador(dados.getUsers().get(tokens.get(2)));
             enc.setLoja(dados.getLojas().get(tokens.get(3)));
             enc.setPeso(parseFloat(tokens.get(4)));
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH-mm");
+            enc.setData(LocalDateTime.parse(tokens.get(5),formatter));
+
+
 
 
             List<Produto> aux = new ArrayList<>();
-            int i = 5;
+            int i = 6;
             while (i < tokens.size()) {
                 Produto x = new Produto();
                 x.setReferencia(tokens.get(i++));

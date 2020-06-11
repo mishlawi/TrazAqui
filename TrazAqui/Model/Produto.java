@@ -16,7 +16,6 @@ public class Produto implements Serializable {
     private String nome;
     private double quantidade;
     private double preco;
-    private boolean medicinal;
     private double peso;
 
     public Produto(){
@@ -24,7 +23,6 @@ public class Produto implements Serializable {
         this.nome= "";
         this.quantidade= 0;
         this.preco = 0;
-        this.medicinal = false;
         this.peso = 0;
     }
 
@@ -34,7 +32,6 @@ public class Produto implements Serializable {
         this.nome = nome;
         this.quantidade = quantidade;
         this.preco = preco;
-        this.medicinal = medicinal;
         this.peso = peso;
     }
 
@@ -43,7 +40,6 @@ public class Produto implements Serializable {
         this.nome = a.getNome();
         this.quantidade = a.getQuantidade();
         this.preco = a.getPreco();
-        this.medicinal = a.isMedicinal();
         this.peso = a.getPeso();
 
 
@@ -80,13 +76,8 @@ public class Produto implements Serializable {
         this.preco = preco;
     }
 
-    public boolean isMedicinal() {
-        return medicinal;
-    }
 
-    public void setMedicinal(boolean medicinal) {
-        this.medicinal = medicinal;
-    }
+
 
     public void setReferencia(String referencia) {
         this.referencia = referencia;
@@ -105,14 +96,13 @@ public class Produto implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         Produto produto = (Produto) o;
         return quantidade == produto.quantidade &&
-                medicinal == produto.medicinal &&
                 nome.equals(produto.nome);
     }
 
     public String navString() {
         DecimalFormat df = new DecimalFormat("####0.00");
         StringBuilder sb = new StringBuilder();
-        sb.append(this.getReferencia() + " " + this.getNome() + " " + df.format(this.getPreco()));
+        sb.append(this.getReferencia() + " " + this.getNome() + " " + df.format(this.getPreco()) + "$");
         return sb.toString();
     }
 
@@ -123,7 +113,6 @@ public class Produto implements Serializable {
                 ", nome='" + nome + '\'' +
                 ", quantidade=" + quantidade +
                 ", preco=" + preco +
-                ", medicinal=" + medicinal +
                 '}';
     }
 

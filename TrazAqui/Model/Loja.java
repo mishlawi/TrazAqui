@@ -99,6 +99,9 @@ public class Loja extends Ator implements Serializable {
                 ;
     }
 
+
+
+
     public void setProdutos(Map<String,Produto>prod){
         this.produtos = new HashMap<>();
         prod.entrySet().forEach(e-> this.produtos.put(e.getKey(),

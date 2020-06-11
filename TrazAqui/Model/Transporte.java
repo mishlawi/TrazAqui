@@ -212,10 +212,11 @@ public  class Transporte extends Ator implements Serializable {
 
     public double tempoViagem(Encomenda a) {
 
-
+    if (this.getVelocidadeMedia() == 0) this.setVelocidadeMedia(ThreadLocalRandom.current().nextInt(30,80));
     double tempo = ((a.getLoja().getMorada().distance(this.getMorada())+a.getComprador().getMorada().distance(a.getLoja().getMorada()))*60)/this.getVelocidadeMedia();
     tempo+=a.getLoja().tempoTotalEspera();
         int atraso = ThreadLocalRandom.current().nextInt(0, 50);
+        System.out.println(atraso);
         if (atraso>0 && atraso < 10){
             double c = tempo*(atraso/100);
             tempo += c;

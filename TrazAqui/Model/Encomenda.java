@@ -3,6 +3,7 @@ package Model;
 
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -11,7 +12,6 @@ import java.util.*;
  * Classe Encomenda
  * @author grupo 115
  */
-
 
 public class Encomenda implements Serializable
 {
@@ -89,8 +89,11 @@ public class Encomenda implements Serializable
        this.aceiteCliente = a.isAceiteCliente();
 
     }
-    
-    // Getters
+
+    /**
+     * Getters
+     *
+     */
     public User getComprador() {
         return this.comprador;
     }
@@ -150,6 +153,11 @@ public class Encomenda implements Serializable
     public boolean isEfetuada() {
         return entregaEfetuada;
     }
+
+    /**
+     * Setters
+     *
+     */
 
     public void setData(LocalDateTime data) {
         this.data = data;
@@ -236,7 +244,6 @@ public class Encomenda implements Serializable
     }
 
 
-
     @Override
     public String toString() {
         return "Encomenda{" +
@@ -255,23 +262,23 @@ public class Encomenda implements Serializable
     }
 
     public String toStringNav() {
-        return  "comprador=" + this.getComprador().getNome() +
-                ", loja=" + this.getLoja().getNome() +
-                ", referencia='" + referencia + '\'' +
-                ", peso=" + peso +
-                ", pedido feito em " + this.getData().toLocalDate()
+        return  "Cliente: " + this.getComprador().getNome() +
+                " Loja: " + this.getLoja().getNome() +
+                " Referencia da encomenda " + referencia + '\'' +
+                " Peso" + peso +
+                " kg \t| Pedido feito em " + this.getData().toLocalDate()
                 + " às " + this.getData().toLocalTime()
                 ;
     }
 
     public String toStringNavpreco() {
-        return  ", loja=" + this.getLoja().getNome() +
-                " referencia='" + referencia + '\'' +
-                "peso=" + peso +
-                " requesitado em " + this.getData().toLocalDate()
+        return  "Loja= " + this.getLoja().getNome() +
+                " Referencia= " + referencia + '\'' +
+                " Peso= " + peso +
+                " Requesitado em " + this.getData().toLocalDate()
                 + " às " + this.getData().toLocalTime() +
-                " valor unidades " + this.getCustoProdutos() +
-                " valor transporte " +this.getCustoTransporte()
+                " Valor unidades " + this.getCustoProdutos() +
+                " Valor transporte " +this.getCustoTransporte()
                 ;
     }
 

@@ -745,7 +745,7 @@ public class TrazAqui implements Serializable {
 
 
     //basicamente trata da encomenda
-    public void addEncomendaEmpresa(){
+    public EmpresaTransportadora addEncomendaEmpresa(){
 
         Encomenda e = this.getEncomenda();
         EmpresaTransportadora t = getEmpresaTransporte().get(e.getDistribuidor().getReferencia());
@@ -759,6 +759,7 @@ public class TrazAqui implements Serializable {
         adicionaEncomenda(e); //atualiza registo da encomenda global
         e.setCustoTransporte(t.defineCusto(e));
         this.setEmpresaIn(t);
+        return t;
     }
 
 

@@ -1,4 +1,4 @@
-package Model;
+package Model.Exeptions;
 
 public class ProdutosException extends Exception
 {
