@@ -1,8 +1,9 @@
-package Model;
+package Model.Atores.Transportadores;
+
+import Model.Encomenda;
 
 import java.awt.geom.Point2D;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -23,7 +24,7 @@ public class Voluntario extends Transporte implements Serializable
 
     }
 
-    public Voluntario(String email, String referencia, String nome, String password, Point2D.Double morada, long nif, boolean disponibilidade, float raio, boolean certeficado, double classificacao, int numeroEntregas , double velocidadeMedia, double nrKms, Map<String,Encomenda> enc) {
+    public Voluntario(String email, String referencia, String nome, String password, Point2D.Double morada, long nif, boolean disponibilidade, float raio, boolean certeficado, double classificacao, int numeroEntregas , double velocidadeMedia, double nrKms, Map<String, Encomenda> enc) {
         super(email, referencia, nome, password, morada,nif, disponibilidade,raio, certeficado,  classificacao, numeroEntregas, velocidadeMedia, nrKms,enc);
 
        }

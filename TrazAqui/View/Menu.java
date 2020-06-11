@@ -1,10 +1,7 @@
 package View;
 
-import Model.Input;
-
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.io.Serializable;
 
 public class Menu implements Serializable

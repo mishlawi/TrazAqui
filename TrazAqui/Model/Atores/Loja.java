@@ -1,4 +1,7 @@
-package Model;
+package Model.Atores;
+
+import Model.Encomenda;
+import Model.Produto;
 
 import java.awt.geom.Point2D;
 import java.io.Serializable;
@@ -11,8 +14,8 @@ public class Loja extends Ator implements Serializable {
 
     private int fila;
     private float espera; //tempo médio de espera por cliente
-    private Map<String,Encomenda> encomendas;
-    private Map<String,Produto> produtos;
+    private Map<String, Encomenda> encomendas;
+    private Map<String, Produto> produtos;
 
 
 

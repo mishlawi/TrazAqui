@@ -1,7 +1,7 @@
 package Model.Comparators;
 
 
-import Model.EmpresaTransportadora;
+import Model.Atores.Transportadores.EmpresaTransportadora;
 
 import java.util.Comparator;
 import java.io.Serializable;

@@ -1,5 +1,7 @@
-package Model;
+package Model.Atores;
 
+
+import Model.Encomenda;
 
 import java.awt.geom.Point2D;
 import java.io.Serializable;
@@ -10,7 +12,7 @@ import java.util.Map;
 
 
 public class User extends Ator implements Serializable,Comparable<User>{
-private Map<String,Encomenda> encomendas;
+private Map<String, Encomenda> encomendas;
 
     /**
      * Constructores

@@ -6,7 +6,7 @@ all he/she needs to know. The comments should usually include at least:
 
 PROJECT TITLE:
 PURPOSE OF PROJECT:
-VERSION or DATE:
+VERSION or DATE: 2020 Jun
 HOW TO START THIS PROJECT:
-AUTHORS:
-USER INSTRUCTIONS:
+AUTHORS: Grupo 115 POO
+USER INSTRUCTIONS: Run APP

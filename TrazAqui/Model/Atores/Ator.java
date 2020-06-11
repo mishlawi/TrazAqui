@@ -1,4 +1,4 @@
-package Model;
+package Model.Atores;
 
 import java.awt.geom.Point2D;
 import java.io.Serializable;
@@ -120,20 +120,21 @@ public abstract class Ator implements Serializable
     }
 
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Ator)) return false;
         Ator ator = (Ator) o;
-        return nif == ator.nif &&
-                email.equals(ator.email) &&
-                referencia.equals(ator.referencia) &&
-                nome.equals(ator.nome) &&
-                password.equals(ator.password) &&
-                morada.equals(ator.morada);
+        return getNif() == ator.getNif() &&
+                Objects.equals(getEmail(), ator.getEmail()) &&
+                Objects.equals(getReferencia(), ator.getReferencia()) &&
+                Objects.equals(getNome(), ator.getNome()) &&
+                Objects.equals(getPassword(), ator.getPassword()) &&
+                Objects.equals(getMorada(), ator.getMorada());
     }
 
-
+    @Override
     public int hashCode() {
-        return Objects.hash(email, referencia, nome, password, morada, nif);
+        return Objects.hash(getEmail(), getReferencia(), getNome(), getPassword(), getMorada(), getNif());
     }
 }

@@ -1,15 +1,15 @@
-package Model;
+package Model.Atores.Transportadores;
 
-import Model.Comparators.DataComparator;
+import Model.Atores.Ator;
+import Model.Encomenda;
 
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 /**
  * Classe Transporte
@@ -30,7 +30,7 @@ public  class Transporte extends Ator implements Serializable {
     private int numeroEntregas;
     private double velocidadeMedia; //em km/h
     private double numeroKms;
-    private Map<String,Encomenda> encomendas;
+    private Map<String, Encomenda> encomendas;
 
     /**
      * Construtor por omissão
@@ -167,18 +167,16 @@ public  class Transporte extends Ator implements Serializable {
 
 
     /**
-     * Adiciona encomenda ao registo de encomendas
-     * @param e
+     * Metodos
+     *
      */
+
+
 
     public void adicionaEncomendaTransporte(Encomenda e) {
         this.encomendas.put(e.getReferencia(),e.clone());
     }
 
-    /**
-     *
-     * @param a
-     */
     public void aceitaEncomenda(Encomenda a) {
         setDisponibilidade(false);
     }
@@ -230,13 +228,6 @@ public  class Transporte extends Ator implements Serializable {
         return tempo;
     }
 
-    public Map<String,Encomenda> getEncomendasEfetuadas(){
-        Map<String,Encomenda> aux = new HashMap<>();
-        for (Map.Entry<String,Encomenda> e : this.encomendas.entrySet())
-            if(e.getValue().isEfetuada()) aux.put(e.getKey(),e.getValue().clone());
-        return aux;
-    }
-
     public Map<String,Encomenda> getEncomendasPedidas(){
         Map<String,Encomenda> aux = new HashMap<>();
         for (Map.Entry<String,Encomenda> e : this.encomendas.entrySet())
@@ -244,10 +235,6 @@ public  class Transporte extends Ator implements Serializable {
         return aux;
     }
 
-    public List<Encomenda> encPedidasData(){
-        return getEncomendasPedidas().values().stream().
-                sorted(new DataComparator()).collect(Collectors.toList());
-    }
 
     public void removeEncomendaTransportador(Encomenda e) {
         this.encomendas.remove(e.getReferencia());
@@ -270,7 +257,26 @@ public  class Transporte extends Ator implements Serializable {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Transporte)) return false;
+        if (!super.equals(o)) return false;
+        Transporte that = (Transporte) o;
+        return disponibilidade == that.disponibilidade &&
+                Double.compare(that.getRaio(), getRaio()) == 0 &&
+                isCerteficado() == that.isCerteficado() &&
+                Double.compare(that.getClassificacao(), getClassificacao()) == 0 &&
+                getNumeroEntregas() == that.getNumeroEntregas() &&
+                Double.compare(that.getVelocidadeMedia(), getVelocidadeMedia()) == 0 &&
+                Double.compare(that.getNumeroKms(), getNumeroKms()) == 0 &&
+                Objects.equals(getEncomendas(), that.getEncomendas());
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(disponibilidade, getRaio(), isCerteficado(), getClassificacao(), getNumeroEntregas(), getVelocidadeMedia(), getNumeroKms(), getEncomendas());
+    }
 
     public  Transporte clone(){
         return new Transporte(this);

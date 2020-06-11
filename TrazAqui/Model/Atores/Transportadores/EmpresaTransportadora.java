@@ -1,7 +1,8 @@
-package Model;
+package Model.Atores.Transportadores;
+
+import Model.Encomenda;
 
 import java.awt.geom.Point2D;
-import java.util.HashMap;
 import java.util.Map;
 
 public class EmpresaTransportadora extends Transporte
@@ -21,7 +22,7 @@ public class EmpresaTransportadora extends Transporte
     }
 
 
-    public EmpresaTransportadora(String email,String referencia, String nome, String password, Point2D.Double morada, long nif, boolean disponibilidade, float raio, boolean certeficado, double classificacao, int numeroEntregas , double velocidadeMedia, double numeroKms, double custoTransporte,Map<String,Encomenda> encomendas,double totalFaturado) {
+    public EmpresaTransportadora(String email, String referencia, String nome, String password, Point2D.Double morada, long nif, boolean disponibilidade, float raio, boolean certeficado, double classificacao, int numeroEntregas , double velocidadeMedia, double numeroKms, double custoTransporte, Map<String, Encomenda> encomendas, double totalFaturado) {
 
         super(email,referencia,nome, password, morada,nif, disponibilidade,raio, certeficado,  classificacao, numeroEntregas,velocidadeMedia, numeroKms, encomendas);
         this.taxa = custoTransporte;
@@ -83,8 +84,6 @@ public class EmpresaTransportadora extends Transporte
     public double defineCusto(Encomenda a ){
         double b = this.getMorada().distance(a.getLoja().getMorada())+a.getLoja().getMorada().distance(a.getComprador().getMorada())*this.getTaxa();
         double c = a.getPeso()*this.getTaxa();
-        System.out.println(b);
-        System.out.println(c);
         return b+c;
     }
 

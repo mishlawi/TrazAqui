@@ -1,5 +1,10 @@
 package Model;
 
+import Model.Atores.Transportadores.EmpresaTransportadora;
+import Model.Atores.Loja;
+import Model.Atores.Transportadores.Transporte;
+import Model.Atores.Transportadores.Voluntario;
+import Model.Atores.User;
 import Model.Comparators.DataComparator;
 import Model.Comparators.KmComparator;
 import Model.Exeptions.LoginErradoException;
@@ -16,10 +21,10 @@ public class TrazAqui implements Serializable {
 
 
 
-    private Map<String,Loja> lojas;
-    private Map<String,User> users;
-    private Map<String,Transporte> transporte; // k: email
-    private Map<String,Encomenda> encomendas; //k: referencia da encomenda
+    private Map<String, Loja> lojas;
+    private Map<String, User> users;
+    private Map<String, Transporte> transporte;
+    private Map<String,Encomenda> encomendas;
     private User userIn;
     private Voluntario voluntarioIn;
     private EmpresaTransportadora empresaIn;
@@ -208,8 +213,8 @@ public class TrazAqui implements Serializable {
 
         return aux;
     }
-    //retorna os voluntarios
 
+    //retorna os voluntarios
     public Map<String,Voluntario> getVoluntariosTransporte(){
         Map <String,Voluntario> aux = new HashMap<>();
         for(Map.Entry<String,Transporte> e:this.transporte.entrySet())
@@ -277,6 +282,11 @@ public class TrazAqui implements Serializable {
         x.adicionaEncomendaTransporte(b);
         adicionaTransportador(x);
     }
+    public void adicionaEncomendaVoluntario(Voluntario a,Encomenda b ){
+        Voluntario x = this.getVoluntariosTransporte().get(a.getReferencia());
+        x.adicionaEncomendaTransporte(b);
+        adicionaTransportador(x);
+    }
 
 
 
@@ -332,10 +342,6 @@ public class TrazAqui implements Serializable {
     }
 
 
-    //obter encomenda a partir da sua referencia (key)
-    public Encomenda getEncomenda(String referencia) {
-        return getEncomendas().get(referencia);
-    }
 
 
     /**
@@ -511,18 +517,15 @@ public class TrazAqui implements Serializable {
 
         }
 
-    /*basicamente retira todos os pedidos existentes para esta loja */
 
     public List<Encomenda> getPedidosLoja(){
-
-        Map<String,Encomenda> aux = this.getEncomendas();
-        List <Encomenda> res = aux.values().stream().filter(e->!e.isEfetuada() || !e.isAceiteTransportador() || !e.isAceiteCliente() && e.getLoja().getReferencia().equals(this.lojaIn.getReferencia())).collect(Collectors.toList());
+        Map<String,Encomenda> aux = this.encomendas;
+        List <Encomenda> res = aux.values().stream().filter(e-> e.getLoja().getReferencia().equals(this.lojaIn.getReferencia()) && !e.isEfetuada()).collect(Collectors.toList());
         return res;
     }
 
 
 
-    //filtra os transportadores disponiveis e que conseguem fazer a entrega nas moradas da encomenda
     private Map<String, Transporte> EncomendaTransporte(Encomenda a) {
         Map<String, Transporte> aux = new HashMap<>();
 
@@ -650,14 +653,14 @@ public class TrazAqui implements Serializable {
 
         Encomenda e = this.getEncomenda();
         EmpresaTransportadora t = getEmpresaTransporte().get(e.getDistribuidor().getReferencia());
-        t.aceitaEncomenda(e); //diz que esta ocupado numa entrega
+        t.aceitaEncomenda(e);
         e.setEfetuada(true);
         t.addKms(e);
         t.addFatura(e);
         e.setTempo(t.tempoViagem(e));
         adicionaTransportador(t);
         t.adicionaEncomendaTransporte(e);
-        adicionaEncomenda(e); //atualiza registo da encomenda global
+        adicionaEncomenda(e);
         e.setCustoTransporte(t.defineCusto(e));
         this.setEmpresaIn(t);
         return t;
@@ -668,12 +671,12 @@ public class TrazAqui implements Serializable {
     public void addEncomendaVoluntario(){
         Encomenda e = this.getEncomenda();
         Voluntario t = getVoluntariosTransporte().get(e.getDistribuidor().getReferencia());
-        t.aceitaEncomenda(e); //diz que esta ocupado numa entrega
-        e.setEfetuada(true); //diz que a efetuou
-        t.addKms(e); //adiciona kms
-        e.setTempo(t.tempoViagem(e)); //tempo da viagem
+        t.aceitaEncomenda(e);
+        e.setEfetuada(true);
+        t.addKms(e);
+        e.setTempo(t.tempoViagem(e));
         t.adicionaEncomendaTransporte(e);
-        adicionaTransportador(t); //atualiza os seus dados no map de transportadores
+        adicionaTransportador(t);
         this.setVoluntarioIn(t);
     }
 

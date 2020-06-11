@@ -2,8 +2,11 @@ package Model;
 
 
 
+import Model.Atores.Loja;
+import Model.Atores.Transportadores.Transporte;
+import Model.Atores.User;
+
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -263,10 +266,10 @@ public class Encomenda implements Serializable
 
     public String toStringNav() {
         return  "**"+ "Cliente: " + this.getComprador().getNome() +
-                " Loja: " + this.getLoja().getNome() +
-                " Referencia da encomenda " + referencia +
-                " Peso " + peso +
-                " kg| Pedido feito em " + this.getData().toLocalDate()
+                " | Loja: " + this.getLoja().getNome() +
+                " | Referencia da encomenda " + referencia +
+                " | Peso " + peso +
+                " kg | Pedido feito em " + this.getData().toLocalDate()
                 + " às " + this.getData().toLocalTime()+"\n"
                 ;
     }
