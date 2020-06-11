@@ -207,20 +207,9 @@ public  class Transporte extends Ator implements Serializable {
     }
 
     public void removeEncomendaTransportador(Encomenda e) {
-        this.getEncomendas().remove(e.getReferencia());
+        this.encomendas.remove(e.getReferencia());
     }
 
-/*
-    public void encomendaEntregue (Encomenda a, Servico s){
-        tempoViagem(a);
-        s.adicionaEfetuado(a);
-        Map<String,Encomenda> aux = s.getPedidos();
-        aux.remove(a.getReferencia());
-        s.setPedidos(aux);
-        this.setDisponibilidade(true);
-
-    }
-*/
 
     @Override
     public String toString() {

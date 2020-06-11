@@ -106,6 +106,11 @@ public class Loja extends Ator implements Serializable {
                 e.getValue().clone()));
     }
 
+
+    public void removeEncomendaLoja(Encomenda e) {
+        this.encomendas.remove(e.getReferencia());
+    }
+
     /*Metodos*/
 
     public void adicionaEncomendaLoja(Encomenda e) {

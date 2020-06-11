@@ -287,16 +287,45 @@ public class TrazAqui implements Serializable {
         adicionaLoja(a);
 
     }
+    public void adicionaEncomendaTransportador(EmpresaTransportadora a,Encomenda b ){
+        EmpresaTransportadora x = this.getEmpresaTransporte().get(a.getReferencia());
+        x.adicionaEncomendaTransporte(b);
+        adicionaTransportador(x);
+    }
 
-    public List<Encomenda> getEncomendasNaoEfetuadas()
-    {
-        List<Encomenda> aux = new ArrayList<>();
-        for(Encomenda v : this.encomendas.values())
-            if (v.isEfetuada()==false){
-                Encomenda enc = (Encomenda) v.clone();
-                aux.add(enc);
-            }
-        return aux;
+
+
+    public Transporte removeEncomendaTransportador(String ref,Encomenda e){
+        if (this.transporte.get(ref) instanceof EmpresaTransportadora){
+            EmpresaTransportadora et = (EmpresaTransportadora) this.transporte.get(ref);
+            et.removeEncomendaTransportador(e);
+            this.adicionaTransportador(et);
+        }
+        if (this.transporte.get(ref) instanceof Voluntario){
+            Voluntario v = (Voluntario) this.transporte.get(ref);
+            v.removeEncomendaTransportador(e);
+            this.adicionaTransportador(v);
+        }
+        return this.transporte.get(ref);
+    }
+
+    public void removeEncomendaGeral(Encomenda a){
+        Loja l = a.getLoja();
+        User u = a.getComprador();
+        if(a.getDistribuidor() instanceof EmpresaTransportadora) {
+            EmpresaTransportadora e = (EmpresaTransportadora) a.getDistribuidor();
+            this.removeEncomendaTransportador(e.getReferencia(),a);
+        }
+        if(a.getDistribuidor() instanceof Voluntario) {
+            Voluntario e = (Voluntario) a.getDistribuidor();
+            this.removeEncomendaTransportador(e.getReferencia(),a);
+
+        }
+        l.removeEncomendaLoja(a);
+        u.removeEncomendaUser(a);
+        this.adicionaUser(u);
+        this.adicionaLoja(l);
+        this.encomendas.remove(a.getReferencia());
     }
 
     public List<Encomenda> getEncomendasEfetuadas()
@@ -335,6 +364,10 @@ public class TrazAqui implements Serializable {
     public void adicionaEncomenda(Encomenda e) {
         this.encomendas.put(e.getReferencia(),e.clone());
     }
+
+
+    public void removeEncomenda(Encomenda e) {this.encomendas.remove(e.getReferencia());}
+
 
 
 
@@ -737,7 +770,7 @@ public class TrazAqui implements Serializable {
     //basicamente trata da encomenda
     public void addEncomendaEmpresa(){
 
-        Encomenda e = this.getEmpresaIn().encPedidasData().get(0);
+        Encomenda e = this.getEncomenda();
         EmpresaTransportadora t = getEmpresaTransporte().get(e.getDistribuidor().getReferencia());
         t.aceitaEncomenda(e); //diz que esta ocupado numa entrega
         e.setEfetuada(true);
@@ -750,6 +783,8 @@ public class TrazAqui implements Serializable {
         e.setCustoTransporte(t.defineCusto(e));
         this.setEmpresaIn(t);
     }
+
+
 
     public void addEncomendaVoluntario(){
         Encomenda e = this.getEmpresaIn().encPedidasData().get(0);

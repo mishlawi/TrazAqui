@@ -43,6 +43,10 @@ private Map<String,Encomenda> encomendas;
 
     }
 
+    public void removeEncomendaUser(Encomenda e) {
+        this.encomendas.remove(e.getReferencia());
+    }
+
 
     public void setEncomendas(Map<String,Encomenda>enc){
         this.encomendas = new HashMap<>();
